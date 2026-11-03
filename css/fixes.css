@@ -18,3 +18,17 @@
 
 /* видео первого экрана — без контролов */
 .tn-atom__videoiframe__html-video { pointer-events: none; }
+
+/* служебные обёртки Тильды (анимация/липкость) должны наследовать размеры элемента */
+.tn-molecule__prx-wrapper, .tn-molecule__sticky-wrapper { display: inherit; width: inherit; height: inherit; border-radius: inherit; }
+.tn-atom__sbs-anim-wrapper { display: inherit; width: inherit; height: inherit; }
+
+/* блог на телефоне: лента листается только вбок, без прокрутки вверх-вниз */
+@media screen and (max-width: 639px) {
+  #rec3443016901 #molecule-1773906386993000002 { overflow-x: auto !important; overflow-y: hidden !important; overscroll-behavior-x: contain; scrollbar-width: none; }
+  #rec3443016901 #molecule-1773906386993000002::-webkit-scrollbar { display: none; }
+}
+
+/* мобильное меню открывается под шапкой, шапка остаётся видна */
+#rec5382322501 .t-menu-popover__maincontainer { position: relative; z-index: 10000; }
+#rec5382322501 .t-menu-popover__burgermenu__dropdown { top: var(--menu-top, 0px); }

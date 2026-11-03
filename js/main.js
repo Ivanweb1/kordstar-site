@@ -4,7 +4,8 @@
 
 /* 1. Масштаб Zero-блоков: макет нарисован под ширины 1200/960/640/480/320 и растягивается на ширину окна */
 (function () {
-  var BREAKS = [1200, 960, 640, 480, 320];
+  // 480 пропускаем: ниже 640 везде телефонный макет (у Тильды макет 480–639 не доделан)
+  var BREAKS = [1200, 960, 640, 320];
   function base() {
     for (var i = 0; i < BREAKS.length - 1; i++) {
       if (window.matchMedia('(min-width: ' + BREAKS[i] + 'px)').matches) return BREAKS[i];
@@ -13,8 +14,9 @@
   }
   // настройка артборда для текущей ширины; если не задана — наследуется от более широкой
   function attr(ab, name, b) {
-    for (var i = BREAKS.indexOf(b); i >= 0; i--) {
-      var v = ab.getAttribute('data-artboard-' + name + (i === 0 ? '' : '-res-' + BREAKS[i]));
+    var ALL = [1200, 960, 640, 480, 320];
+    for (var i = ALL.indexOf(b); i >= 0; i--) {
+      var v = ab.getAttribute('data-artboard-' + name + (i === 0 ? '' : '-res-' + ALL[i]));
       if (v !== null) return v;
     }
     return null;
@@ -111,8 +113,10 @@
   if (burger && menu) {
     burger.addEventListener('click', function () {
       var opened = burger.getAttribute('aria-expanded') === 'true';
+      var head = document.querySelector('#rec5382322501 .t-menu-popover__maincontainer');
+      if (head) menu.style.setProperty('--menu-top', head.getBoundingClientRect().bottom + 'px');
       burger.setAttribute('aria-expanded', String(!opened));
-      burger.classList.toggle('t-menu-burger_opened', !opened);
+      burger.classList.toggle('t-menu-burger_open', !opened); // бургер → крестик
       menu.classList.toggle('t-menu-popover__burgermenu_opened', !opened);
     });
     menu.addEventListener('click', function (e) {
