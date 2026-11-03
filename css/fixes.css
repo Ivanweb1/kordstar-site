@@ -63,3 +63,7 @@
   #rec3443016301 .tn-elem[data-elem-id="1787765366573000012"],
   #rec3443016301 .tn-elem[data-elem-id="1787765390874000016"] { width: 22px !important; min-width: 0 !important; }
 }
+
+/* перенос строки только на телефоне */
+.br-mob { display: none; }
+@media screen and (max-width: 640px) { .br-mob { display: inline; } }
