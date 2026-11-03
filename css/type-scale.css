@@ -86,3 +86,6 @@
 @media screen and (min-width: 1200px) {
   #rec3443016301 .tn-group[data-group-id="1788037801654000001"] { top: auto !important; bottom: 24px !important; }
 }
+
+/* пояснение справа от «Категорий каталога» — тот же приглушённый цвет, что у пояснения «Контроля качества» (60%) */
+#rec3443015901 .tn-elem[data-elem-id="1787474368022"] .tn-atom { opacity: 0.6 !important; }
