@@ -68,3 +68,7 @@
 
 /* подпись «Лебёдки электрические» стала 12px — плашка растягивается под текст */
 #rec3719020401 .tn-group[data-group-id="1788980225687000003"] { width: auto !important; }
+
+/* вопросы FAQ — как заголовки карточек: 16px макета, растут вместе с окном (на 1440 ≈ 19px) */
+.qf-faq__question-text { font-size: calc(16px * var(--kz, 1)) !important; line-height: 1.4 !important; }
+@media screen and (max-width: 640px) { .qf-faq__question-text { font-size: 15px !important; } }

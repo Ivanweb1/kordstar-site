@@ -62,6 +62,14 @@
       var need = (bottom - top) / z + 25; // 25px — нижний отступ, как в оригинальной карточке
       [g, m].forEach(function (el) { if (el) el.style.minHeight = need + 'px'; });
     });
+    // подписи под картинками на первом экране — ровно по центру своей карточки
+    ['1788980163174000002', '1788980322607000008', '1788980291284000006', '1788980225687000004'].forEach(function (id) {
+      var label = document.querySelector('#rec3719020401 .tn-elem[data-elem-id="' + id + '"]');
+      var pill = label && label.closest('.t396__group');
+      var card = pill && pill.parentElement.closest('.t396__group');
+      if (!card || !pill.offsetParent) return;
+      pill.style.left = (card.offsetWidth - pill.offsetWidth) / 2 + 'px';
+    });
   }
   function update() { scale(); fit(); }
   update();
