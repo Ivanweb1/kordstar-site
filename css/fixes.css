@@ -56,3 +56,10 @@
 
 /* слайдер команды (телефон): тень у стрелок мягче */
 .vbg-section .vbg-btn { box-shadow: rgba(17, 19, 18, 0.08) 0px 8px 20px 0px, rgba(17, 19, 18, 0.04) 0px 2px 6px 0px !important; }
+
+/* «Контроль качества», телефон: цифры 01–03 без лишней ширины — текст ближе к цифре */
+@media screen and (max-width: 639px) {
+  #rec3443016301 .tn-elem[data-elem-id="1787765140322000003"],
+  #rec3443016301 .tn-elem[data-elem-id="1787765366573000012"],
+  #rec3443016301 .tn-elem[data-elem-id="1787765390874000016"] { width: 22px !important; min-width: 0 !important; }
+}

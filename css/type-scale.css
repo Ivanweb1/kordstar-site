@@ -101,3 +101,31 @@
   .qf-faq__subtitle,
   .qf-faq__answer-text { font-size: 15px !important; }
 }
+
+
+/* описания пунктов «Почему клиенты выбирают» и карточек каталога — чуть темнее (80%), на всех ширинах */
+#rec3720600801 .tn-elem[data-elem-id="1787765157307000004"] .tn-atom,
+#rec3720600801 .tn-elem[data-elem-id="1789237373608000007"] .tn-atom,
+#rec3720600801 .tn-elem[data-elem-id="1787850948069000012"] .tn-atom,
+#rec3720600801 .tn-elem[data-elem-id="1787850972974000017"] .tn-atom,
+#rec3720600801 .tn-elem[data-elem-id="1787850998443000022"] .tn-atom,
+#rec3443015901 .tn-elem[data-elem-id="1787470949066000014"] .tn-atom,
+#rec3443015901 .tn-elem[data-elem-id="1793466687966000005"] .tn-atom,
+#rec3443015901 .tn-elem[data-elem-id="1787470907364000005"] .tn-atom,
+#rec3443015901 .tn-elem[data-elem-id="1787473834901000010"] .tn-atom,
+#rec3443015901 .tn-elem[data-elem-id="1787473836534000015"] .tn-atom,
+#rec3443015901 .tn-elem[data-elem-id="1791996295254000004"] .tn-atom { opacity: 1 !important; color: rgba(32, 49, 51, 0.8) !important; }
+#rec3720600801 .tn-elem[data-elem-id="1787765157307000004"] .tn-atom span:not(strong),
+#rec3720600801 .tn-elem[data-elem-id="1789237373608000007"] .tn-atom span:not(strong),
+#rec3720600801 .tn-elem[data-elem-id="1787850948069000012"] .tn-atom span:not(strong),
+#rec3720600801 .tn-elem[data-elem-id="1787850972974000017"] .tn-atom span:not(strong),
+#rec3720600801 .tn-elem[data-elem-id="1787850998443000022"] .tn-atom span:not(strong),
+#rec3443015901 .tn-elem[data-elem-id="1787470949066000014"] .tn-atom span:not(strong),
+#rec3443015901 .tn-elem[data-elem-id="1793466687966000005"] .tn-atom span:not(strong),
+#rec3443015901 .tn-elem[data-elem-id="1787470907364000005"] .tn-atom span:not(strong),
+#rec3443015901 .tn-elem[data-elem-id="1787473834901000010"] .tn-atom span:not(strong),
+#rec3443015901 .tn-elem[data-elem-id="1787473836534000015"] .tn-atom span:not(strong),
+#rec3443015901 .tn-elem[data-elem-id="1791996295254000004"] .tn-atom span:not(strong) { color: rgba(32, 49, 51, 0.8) !important; }
+
+/* жирные заголовки пунктов — полным цветом на всех ширинах */
+#rec3720600801 .tn-atom strong { color: rgb(32, 49, 51) !important; }
