@@ -1,0 +1,18 @@
+/* Правки поверх родных стилей страницы (то, что на Тильде делал JS) */
+
+/* блоки «только для телефона» / «только для десктопа» */
+@media (min-width: 641px) { .t-screenmax-640px { display: none !important; } }
+@media (max-width: 639px) { .t-screenmin-640px { display: none !important; } }
+
+/* выпадающее меню «О компании» */
+.t794__tooltip-menu { display: none; z-index: 1000; }
+
+/* бургер-меню на телефоне */
+.t-menu-popover__burgermenu { display: none; }
+.t-menu-popover__burgermenu.t-menu-popover__burgermenu_opened { display: block; }
+
+/* «Наши работы»: заливка кнопки (в исходном CSS цвет пустой, на живом сайте — #69979C) */
+.wb-cases__cta { background-color: #69979C; }
+
+/* видео первого экрана — без контролов */
+.tn-atom__videoiframe__html-video { pointer-events: none; }
