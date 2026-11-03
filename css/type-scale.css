@@ -72,3 +72,6 @@
 /* вопросы FAQ — как заголовки карточек: 16px макета, растут вместе с окном (на 1440 ≈ 19px) */
 .qf-faq__question-text { font-size: calc(16px * var(--kz, 1)) !important; line-height: 1.4 !important; }
 @media screen and (max-width: 640px) { .qf-faq__question-text { font-size: 15px !important; } }
+
+/* кнопка «Смотреть кейс» — на 2px крупнее исходной (было clamp 11–13px) */
+.wb-cases__card-btn { font-size: clamp(13px, calc(0.9vw + 2px), 15px) !important; }
