@@ -26,8 +26,10 @@
   #rec3443016801 .tn-elem[data-elem-id="1791625894500000002"] .tn-atom,
   #rec3443016801 .tn-elem[data-elem-id="1789136628856000031"] .tn-atom,
   #rec3443016801 .tn-elem[data-elem-id="1789212455330000004"] .tn-atom {
-    font-size: 14px !important; line-height: 1.5 !important; color: rgb(32, 49, 51) !important; opacity: 0.7 !important;
+    font-size: 14px !important; line-height: 1.5 !important; color: rgba(32, 49, 51, 0.7) !important; opacity: 1 !important;
   }
+  /* жирные заголовки внутри описаний («Инженерный подбор.» и т.п.) — полным цветом, как заголовки карточек */
+  .t396 .tn-atom strong { color: rgb(32, 49, 51) !important; }
   #rec3443016301 .tn-elem[data-elem-id="1787765140322000003"] .tn-atom,
   #rec3443016301 .tn-elem[data-elem-id="1787765366573000012"] .tn-atom,
   #rec3443016301 .tn-elem[data-elem-id="1787765390874000016"] .tn-atom {

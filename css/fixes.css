@@ -37,3 +37,19 @@
 @media screen and (min-width: 961px) {
   .wb-cases__inner { width: calc(1004px * var(--kz, 1)); max-width: calc(100% - 32px); margin: 0 auto; padding: 0; }
 }
+
+/* плавный переход «Команда» → «Наш блог»: верх фона блога растворяется в цвет предыдущего блока */
+#rec3443016901 { position: relative; }
+#rec3443016901::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; z-index: 4; pointer-events: none;
+  height: calc(70px * var(--zoom, 1));
+  background: linear-gradient(to bottom, #f4f8f9 0%, rgba(244, 248, 249, 0) 100%);
+}
+#rec3443016801 { position: relative; }
+#rec3443016801::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; pointer-events: none;
+  height: calc(70px * var(--zoom, 1));
+  background: linear-gradient(to top, #f4f8f9 0%, rgba(244, 248, 249, 0) 100%);
+}
+/* контент блога (заголовок, карточки) — над слоем растворения */
+#rec3443016901 .tn-group[data-group-id="1788028627024000036"] { z-index: 5 !important; }

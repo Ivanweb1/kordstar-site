@@ -31,8 +31,10 @@ css = """/* Единая шкала текста .
 /* Zero-блоки, десктоп от 1200px (на планшете и телефоне свои макеты Тильды под 12px — их не трогаем) */
 @media screen and (min-width: 1200px) {
 %s {
-    font-size: 14px !important; line-height: 1.5 !important; color: rgb(32, 49, 51) !important; opacity: 0.7 !important;
+    font-size: 14px !important; line-height: 1.5 !important; color: rgba(32, 49, 51, 0.7) !important; opacity: 1 !important;
   }
+  /* жирные заголовки внутри описаний («Инженерный подбор.» и т.п.) — полным цветом, как заголовки карточек */
+  .t396 .tn-atom strong { color: rgb(32, 49, 51) !important; }
 %s {
     font-size: 14px !important; line-height: 1.5 !important;
   }
