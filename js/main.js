@@ -46,13 +46,49 @@
       layers.forEach(function (el) { if (el) el.style.height = h + 'px'; });
     });
   }
-  scale();
+  // карточки с фиксированной высотой растут, если текст в них стал длиннее (после единой шкалы текста)
+  var FIT = ['#rec3443016801 .tn-group[data-group-id="1789136628855000021"]'];
+  function fit() {
+    FIT.forEach(function (s) {
+      var g = document.querySelector(s);
+      if (!g || !g.offsetParent) return;
+      var m = g.querySelector('.tn-molecule');
+      [g, m].forEach(function (el) { if (el) el.style.minHeight = ''; });
+      var z = parseFloat(g.style.zoom) || 1;
+      var top = g.getBoundingClientRect().top, bottom = 0;
+      g.querySelectorAll('.t396__elem').forEach(function (el) {
+        bottom = Math.max(bottom, el.getBoundingClientRect().bottom);
+      });
+      var need = (bottom - top) / z + 25; // 25px — нижний отступ, как в оригинальной карточке
+      [g, m].forEach(function (el) { if (el) el.style.minHeight = need + 'px'; });
+    });
+  }
+  function update() { scale(); fit(); }
+  update();
+  if (document.fonts) document.fonts.ready.then(fit);
   var t;
-  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(scale, 50); });
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(update, 50); });
 })();
 
 /* 2. Появление элементов при прокрутке (fadein / fadeinup / … из настроек Тильды) */
 (function () {
+  // Первый экран: лёгкое появление снизу вверх — небольшой сдвиг, элементы по очереди сверху вниз
+  var hero = document.querySelector('#rec3719020401 .t396__artboard');
+  if (hero) {
+    var items = Array.prototype.filter.call(hero.children, function (el) {
+      return (el.classList.contains('t396__elem') || el.classList.contains('t396__group')) &&
+        el.getAttribute('data-elem-type') !== 'shape'; // фоновые градиенты не трогаем
+    });
+    items.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
+    items.forEach(function (el, i) {
+      el.classList.add('t-animate');
+      el.setAttribute('data-animate-style', 'fadeinup');
+      el.setAttribute('data-animate-distance', '24');
+      el.setAttribute('data-animate-duration', '0.9');
+      el.setAttribute('data-animate-delay', String(Math.min(i * 0.06, 0.6)));
+    });
+  }
+
   var els = document.querySelectorAll('.t396 .t-animate');
   function prep(el) {
     var style = el.getAttribute('data-animate-style') || 'fadein';
