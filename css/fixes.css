@@ -53,3 +53,6 @@
 }
 /* контент блога (заголовок, карточки) — над слоем растворения */
 #rec3443016901 .tn-group[data-group-id="1788028627024000036"] { z-index: 5 !important; }
+
+/* слайдер команды (телефон): тень у стрелок мягче */
+.vbg-section .vbg-btn { box-shadow: rgba(17, 19, 18, 0.08) 0px 8px 20px 0px, rgba(17, 19, 18, 0.04) 0px 2px 6px 0px !important; }

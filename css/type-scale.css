@@ -92,3 +92,12 @@
 
 /* «Как мы работаем?» — текст шага чуть темнее остальных описаний */
 .hwk__card-text { opacity: 0.8 !important; }
+
+/* телефон: описания в собственных блоках чуть крупнее — 15px */
+@media screen and (max-width: 640px) {
+  .hwk__card-text,
+  .wb-cases__lead,
+  .wb-cases__card-desc,
+  .qf-faq__subtitle,
+  .qf-faq__answer-text { font-size: 15px !important; }
+}

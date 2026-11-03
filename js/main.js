@@ -62,6 +62,10 @@
       var need = (bottom - top) / z + 25; // 25px — нижний отступ, как в оригинальной карточке
       [g, m].forEach(function (el) { if (el) el.style.minHeight = need + 'px'; });
     });
+    // открытые ответы FAQ — высота по тексту (после загрузки шрифтов текст может стать длиннее)
+    document.querySelectorAll('.qf-faq__item--open .qf-faq__answer').forEach(function (a) {
+      a.style.maxHeight = a.scrollHeight + 'px';
+    });
     // подписи под картинками на первом экране — ровно по центру своей карточки
     ['1788980163174000002', '1788980322607000008', '1788980291284000006', '1788980225687000004'].forEach(function (id) {
       var label = document.querySelector('#rec3719020401 .tn-elem[data-elem-id="' + id + '"]');
