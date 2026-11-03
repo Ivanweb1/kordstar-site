@@ -75,3 +75,6 @@
 
 /* кнопка «Смотреть кейс» — на 2px крупнее исходной (было clamp 11–13px) */
 .wb-cases__card-btn { font-size: clamp(13px, calc(0.9vw + 2px), 15px) !important; }
+
+/* ответы FAQ — во всю ширину карточки (было ограничение 68 символов) */
+.qf-faq__answer-text { max-width: none !important; }
