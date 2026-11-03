@@ -24,6 +24,8 @@
   function scale() {
     var w = document.documentElement.clientWidth;
     var b = base();
+    // масштаб для собственных блоков (как у Zero-блоков от 1200px и шире)
+    document.documentElement.style.setProperty('--kz', w >= 1200 ? w / 1200 : 1);
     document.querySelectorAll('.t396__artboard').forEach(function (ab) {
       var z = attr(ab, 'upscale', b) === 'window' ? w / b : 1;
       ab.style.setProperty('--zoom', z);

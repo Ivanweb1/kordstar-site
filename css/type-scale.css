@@ -1,0 +1,59 @@
+/* Единая шкала текста.
+   Описание — 14px, межстрочный 1.5, цвет #203133 с прозрачностью 70%.
+   Второстепенный текст — 12px. Размеры для макета 1200px, растут вместе с шириной окна. */
+
+/* Zero-блоки, десктоп и планшет (на телефоне описания уже единые: 12px макета ≈ 14px на экране) */
+@media screen and (min-width: 640px) {
+  #rec3720600801 .tn-elem[data-elem-id="1787850374347000006"] .tn-atom,
+  #rec3720600801 .tn-elem[data-elem-id="1787850480627000009"] .tn-atom,
+  #rec3720600801 .tn-elem[data-elem-id="1787765157307000004"] .tn-atom,
+  #rec3720600801 .tn-elem[data-elem-id="1789237373608000007"] .tn-atom,
+  #rec3720600801 .tn-elem[data-elem-id="1787850948069000012"] .tn-atom,
+  #rec3720600801 .tn-elem[data-elem-id="1787850972974000017"] .tn-atom,
+  #rec3720600801 .tn-elem[data-elem-id="1787850998443000022"] .tn-atom,
+  #rec3443015901 .tn-elem[data-elem-id="1787470949066000014"] .tn-atom,
+  #rec3443015901 .tn-elem[data-elem-id="1793466687966000005"] .tn-atom,
+  #rec3443015901 .tn-elem[data-elem-id="1787470907364000005"] .tn-atom,
+  #rec3443015901 .tn-elem[data-elem-id="1787473834901000010"] .tn-atom,
+  #rec3443015901 .tn-elem[data-elem-id="1787473836534000015"] .tn-atom,
+  #rec3443015901 .tn-elem[data-elem-id="1791996295254000004"] .tn-atom,
+  #rec3443016301 .tn-elem[data-elem-id="1787764058954000001"] .tn-atom,
+  #rec3443016301 .tn-elem[data-elem-id="1787765157307000004"] .tn-atom,
+  #rec3443016301 .tn-elem[data-elem-id="1787765366573000011"] .tn-atom,
+  #rec3443016301 .tn-elem[data-elem-id="1787765390874000015"] .tn-atom,
+  #rec3443016801 .tn-elem[data-elem-id="1789136628856000039"] .tn-atom,
+  #rec3443016801 .tn-elem[data-elem-id="1789136628856000035"] .tn-atom,
+  #rec3443016801 .tn-elem[data-elem-id="1791625894500000002"] .tn-atom,
+  #rec3443016801 .tn-elem[data-elem-id="1789136628856000031"] .tn-atom,
+  #rec3443016801 .tn-elem[data-elem-id="1789212455330000004"] .tn-atom {
+    font-size: 14px !important; line-height: 1.5 !important; color: rgb(32, 49, 51) !important; opacity: 0.7 !important;
+  }
+  #rec3443016301 .tn-elem[data-elem-id="1787765140322000003"] .tn-atom,
+  #rec3443016301 .tn-elem[data-elem-id="1787765366573000012"] .tn-atom,
+  #rec3443016301 .tn-elem[data-elem-id="1787765390874000016"] .tn-atom {
+    font-size: 14px !important; line-height: 1.5 !important;
+  }
+  #rec4660875201 .tn-elem[data-elem-id="1788026018668000001"] .tn-atom,
+  #rec3443017201 .tn-elem[data-elem-id="1788026018668000001"] .tn-atom {
+    font-size: 14px !important; line-height: 1.5 !important;
+  }
+  /* подписи под картинками на первом экране: 10 -> 12 */
+  #rec3719020401 .tn-elem[data-elem-id="1788980163174000002"] .tn-atom,
+  #rec3719020401 .tn-elem[data-elem-id="1788980322607000008"] .tn-atom,
+  #rec3719020401 .tn-elem[data-elem-id="1788980291284000006"] .tn-atom,
+  #rec3719020401 .tn-elem[data-elem-id="1788980225687000004"] .tn-atom {
+    font-size: 12px !important;
+  }
+}
+
+/* Собственные блоки: тот же масштаб, что у Zero-блоков (--kz = ширина окна / 1200) */
+.hwk__card-text,
+.wb-cases__lead,
+.wb-cases__card-desc,
+.qf-faq__subtitle,
+.qf-faq__answer-text {
+  font-size: calc(14px * var(--kz, 1)) !important;
+  line-height: 1.5 !important;
+  color: rgb(32, 49, 51) !important;
+  opacity: 0.7 !important;
+}

@@ -32,3 +32,8 @@
 /* мобильное меню открывается под шапкой, шапка остаётся видна */
 #rec5382322501 .t-menu-popover__maincontainer { position: relative; z-index: 10000; }
 #rec5382322501 .t-menu-popover__burgermenu__dropdown { top: var(--menu-top, 0px); }
+
+/* «Наши работы» по общей сетке: ширина как у остальных блоков (1004px макета), растёт вместе с окном */
+@media screen and (min-width: 961px) {
+  .wb-cases__inner { width: calc(1004px * var(--kz, 1)); max-width: calc(100% - 32px); margin: 0 auto; padding: 0; }
+}
