@@ -75,3 +75,7 @@
 /* слайдер команды (телефон): номер отдельной строкой под должностью */
 .vbg-phone { display: block; margin-top: 6px; font-size: 13px; color: var(--vbg-ink, #111312); text-decoration: none; }
 .vbg-phone--empty { visibility: hidden; }
+
+/* слайдер команды: без нумерации [01]–[05], имя на всю ширину */
+.vbg-panel__index { display: none !important; }
+.vbg-panel__name { right: 14px !important; }
