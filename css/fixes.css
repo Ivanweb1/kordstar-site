@@ -67,3 +67,10 @@
 /* перенос строки только на телефоне */
 .br-mob { display: none; }
 @media screen and (max-width: 640px) { .br-mob { display: inline; } }
+
+/* команда (десктоп): телефон справа от имени */
+.tn-atom.team-name { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; white-space: nowrap; }
+.team-phone { font-size: 13px; color: #333; text-decoration: none; transition: color .2s; }
+.team-phone:hover { color: #3d8a8f; }
+/* слайдер команды (телефон): номер отдельной строкой под должностью */
+.vbg-phone { display: block; margin-top: 6px; font-size: 13px; color: var(--vbg-ink, #111312); text-decoration: none; }
