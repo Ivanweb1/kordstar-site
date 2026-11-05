@@ -75,6 +75,15 @@
 /* слайдер команды (телефон): номер отдельной строкой под должностью */
 .vbg-phone { display: block; margin-top: 6px; font-size: 13px; color: var(--vbg-ink, #111312); text-decoration: none; }
 .vbg-phone--empty { visibility: hidden; }
+/* почты команды: отдельной строкой под должностью/телефоном */
+.team-email { display: block; margin-top: 6px; font-size: 13px; color: #333; text-decoration: none; transition: color .2s; }
+.team-email:hover { color: #3d8a8f; }
+.vbg-email { display: block; margin-top: 2px; font-size: 13px; color: var(--vbg-ink, #111312); text-decoration: none; }
+/* команда (десктоп): имя с отчеством длинное — телефон под именем, плашка растёт по содержимому */
+.tn-atom.team-name { flex-direction: column; align-items: flex-start; gap: 2px; white-space: normal; }
+#rec3443016801 .tn-molecule:has(> .tn-elem .team-email) { height: auto !important; }
+/* карточки стали выше — стрелки слайдера ниже на столько же */
+#rec3443016801 .team-prev, #rec3443016801 .team-next { translate: 0 40px; }
 
 /* слайдер команды: без нумерации [01]–[05], имя на всю ширину */
 .vbg-panel__index { display: none !important; }
