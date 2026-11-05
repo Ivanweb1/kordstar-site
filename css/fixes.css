@@ -81,6 +81,9 @@
 .vbg-email { display: block; margin-top: 2px; font-size: 13px; color: var(--vbg-ink, #111312); text-decoration: none; }
 /* команда (десктоп): имя с отчеством длинное — телефон под именем, плашка растёт по содержимому */
 .tn-atom.team-name { flex-direction: column; align-items: flex-start; gap: 2px; white-space: normal; }
+/* порядок: имя → должность → телефон → почта */
+.tn-atom > .team-phone { display: block; margin-top: 8px; color: #333 !important; }
+.team-phone + .team-email { margin-top: 2px; }
 #rec3443016801 .tn-molecule:has(> .tn-elem .team-email) { height: auto !important; }
 /* карточки стали выше — стрелки слайдера ниже на столько же */
 #rec3443016801 .team-prev, #rec3443016801 .team-next { translate: 0 40px; }
