@@ -73,7 +73,7 @@
 .team-phone { font-size: 13px; color: #333; text-decoration: none; transition: color .2s; }
 .team-phone:hover { color: #3d8a8f; }
 /* слайдер команды (телефон): номер отдельной строкой под должностью */
-.vbg-phone { display: block; margin-top: 6px; font-size: 13px; color: var(--vbg-ink, #111312); text-decoration: none; }
+.vbg-phone { display: block; margin-top: 6px; font-size: 13px; color: var(--vbg-ink, #111312) !important; text-decoration: none; }
 .vbg-phone--empty { visibility: hidden; }
 /* почты команды: отдельной строкой под должностью/телефоном */
 .team-email { display: block; margin-top: 6px; font-size: 13px; color: #333; text-decoration: none; transition: color .2s; }
@@ -87,6 +87,12 @@
 #rec3443016801 .tn-molecule:has(> .tn-elem .team-email) { height: auto !important; }
 /* карточки стали выше — стрелки слайдера ниже на столько же */
 #rec3443016801 .team-prev, #rec3443016801 .team-next { translate: 0 40px; }
+
+/* слайдер команды: лица на одной высоте, как у Павла (на исходниках глаза на разной высоте) */
+.vbg-card__photo[src$="image-61313734.png"] { object-position: 50% 55% !important; } /* Марко */
+.vbg-card__photo[src$="image-65343365.png"] { object-position: 50% 74% !important; } /* Екатерина */
+.vbg-card__photo[src$="image-39373565.png"] { object-position: 50% 65% !important; } /* Роман */
+.vbg-card__photo[src$="image-63333831.png"] { object-position: 50% 51% !important; } /* Дарья */
 
 /* слайдер команды: без нумерации [01]–[05], имя на всю ширину */
 .vbg-panel__index { display: none !important; }
