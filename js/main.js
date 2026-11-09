@@ -2332,3 +2332,37 @@ document.addEventListener("DOMContentLoaded", function() {
 
   window.KRD_POPUP = { open: open, close: close };
 })();
+
+/* 12. Документы и плашка cookie.
+   Адреса страниц политики и согласия — здесь; они же в ссылках с data-krd-link. */
+(function () {
+  var DOCS = { policy: '/policy', consent: '/soglasie' };
+  var KEY = 'krd-cookie-ok';
+
+  document.querySelectorAll('[data-krd-link]').forEach(function (el) {
+    var url = DOCS[el.getAttribute('data-krd-link')];
+    if (!url) return;
+    if (el.tagName === 'A') { el.setAttribute('href', url); return; }
+    // кнопки Zero-блока в подвале — это div, делаем их ссылками
+    el.setAttribute('role', 'link');
+    el.setAttribute('tabindex', '0');
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function () { location.href = url; });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') location.href = url; });
+  });
+
+  var bar = document.querySelector('.krd-cookie');
+  if (!bar) return;
+  var accepted = false;
+  try { accepted = localStorage.getItem(KEY) === '1'; } catch (e) { /* хранилище недоступно — просто покажем */ }
+  if (accepted) return;
+  setTimeout(function () {
+    bar.classList.add('is-open');
+    setTimeout(function () { bar.classList.add('is-shown'); }, 30);
+  }, 800);
+  bar.querySelector('.krd-cookie__btn').addEventListener('click', function () {
+    try { localStorage.setItem(KEY, '1'); } catch (e) { /* не запомним — покажем снова */ }
+    bar.classList.remove('is-shown');
+    setTimeout(function () { bar.classList.remove('is-open'); }, 300);
+  });
+})();
