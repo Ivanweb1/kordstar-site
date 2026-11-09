@@ -199,6 +199,6 @@
 .krd-agree input:checked + .krd-agree__box::after { opacity: 1; }
 .krd-agree input:focus-visible + .krd-agree__box { outline: 2px solid #69979c; outline-offset: 2px; }
 .krd-agree.is-invalid .krd-agree__box { border-color: #c96b5a; }
-.krd-agree.is-invalid .krd-agree__text { color: #c96b5a; }
-.krd-agree__text { font-size: 13px; line-height: 1.5; color: #5f7375; }
+
+.krd-agree__text { font-size: 13px; line-height: 1.5; color: #203133; }
 .krd-agree__text a { color: #457c82; text-decoration: underline; text-underline-offset: 2px; }
