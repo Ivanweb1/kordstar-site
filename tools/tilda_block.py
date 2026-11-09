@@ -85,7 +85,7 @@ for s in re.findall(r"'([^'\n]*)'|\"([^\"\n]*)\"|`([^`]*)`", js):
         js_words.update(re.findall(r'[\w-]+', part))
 
 # ---------- CSS: чистка неиспользуемого ----------
-css_src = '\n'.join(read(p) for p in ('css/page.css', 'css/fixes.css', 'css/type-scale.css'))
+css_src = '\n'.join(read(p) for p in ('css/page.css', 'css/fixes.css', 'css/type-scale.css', 'css/popups.css'))
 TR = GenericTranslator()
 cache = {}
 doc_root = doc.getroottree()

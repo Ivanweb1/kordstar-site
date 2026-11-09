@@ -1946,3 +1946,371 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 })();
+
+/* 11. Поп-апы заявок и отправка через форму Тильды.
+   Кнопка с data-krd-popup="calc" открывает #krd-pop-calc. Своих приёмников у нас нет:
+   заявка переписывается в обычную форму Тильды на этой же странице (блок с формой,
+   у которого в настройках подключены почта / Telegram / CRM) и уходит её кнопкой.
+   Блок-приёмник скрипт прячет сам — в Тильде его НЕ скрывать галочкой, иначе его нет в разметке.
+   Схема та же, что на fulfil.pro (tilda/fx-runtime.js). */
+(function () {
+  var CFG = {
+    donorSelector: 'form.js-form-proccess',
+    submitTimeout: 300000, // капча Тильды может держать отправку несколько минут
+    errorText: 'Не удалось отправить заявку. Позвоните нам: +7 (495) 150-92-22',
+    phoneText: 'Проверьте номер телефона — нужно 10 цифр после +7',
+    fillerEmail: 'no-reply@cordstar.ru'
+  };
+  var root = document.getElementById('krd-pops');
+  if (!root) return;
+
+  // В Тильде вайб-блок может лежать в обёртке с transform — fixed тогда ломается.
+  // Переносим поп-апы в body; у обёртки класс vb-krd, поэтому стили блока к ним применяются.
+  if (root.parentNode !== document.body) document.body.appendChild(root);
+
+  var toast = root.querySelector('.krd-toast');
+  var current = null;
+  var lastFocus = null;
+  var toastTimer;
+
+  function showToast(text) {
+    if (!toast) { alert(text); return; }
+    toast.textContent = text;
+    toast.classList.add('is-shown');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('is-shown'); }, 6000);
+  }
+
+  /* ---------- открыть / закрыть ---------- */
+  function lockScroll(on) {
+    var html = document.documentElement;
+    if (on) {
+      var gap = window.innerWidth - html.clientWidth;
+      html.style.overflow = 'hidden';
+      if (gap > 0) document.body.style.paddingRight = gap + 'px';
+    } else {
+      html.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+  }
+
+  function open(id) {
+    var pop = document.getElementById('krd-pop-' + id);
+    if (!pop) return;
+    if (current) close(true);
+    lastFocus = document.activeElement;
+    pop.classList.remove('is-done');
+    pop.classList.add('is-open');
+    lockScroll(true);
+    current = pop;
+    requestAnimationFrame(function () {
+      pop.classList.add('is-shown');
+      var first = pop.querySelector('.krd-pop__body input:not([type="checkbox"]):not([type="radio"]), .krd-pop__body select, .krd-pop__body textarea');
+      if (first && window.matchMedia('(min-width: 641px)').matches) first.focus({ preventScroll: true });
+    });
+  }
+
+  function close(instant) {
+    var pop = current;
+    if (!pop) return;
+    current = null;
+    pop.classList.remove('is-shown');
+    lockScroll(false);
+    setTimeout(function () {
+      pop.classList.remove('is-open');
+      if (pop.classList.contains('is-done')) {
+        pop.classList.remove('is-done');
+        var form = pop.querySelector('form');
+        if (form) form.reset();
+      }
+    }, instant === true ? 0 : 250);
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+
+  document.querySelectorAll('[data-krd-popup]').forEach(function (el) {
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el.getAttribute('data-krd-popup')); }
+    });
+  });
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest && e.target.closest('[data-krd-popup]');
+    if (trigger) { e.preventDefault(); open(trigger.getAttribute('data-krd-popup')); return; }
+    if (current && e.target.closest && e.target.closest('[data-krd-close]')) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && current) close();
+  });
+
+  /* ---------- маска телефона ---------- */
+  function phoneDigits(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    while (d.length > 10 && (d.charAt(0) === '7' || d.charAt(0) === '8')) d = d.slice(1);
+    return d.slice(0, 10);
+  }
+  function renderPhone(d) {
+    if (!d) return '+7 ';
+    var out = '+7 (' + d.slice(0, 3);
+    if (d.length > 3) out += ') ' + d.slice(3, 6);
+    if (d.length > 6) out += '-' + d.slice(6, 8);
+    if (d.length > 8) out += '-' + d.slice(8, 10);
+    return out;
+  }
+  root.addEventListener('input', function (e) {
+    var f = e.target;
+    if (f.name === 'phone') {
+      var d = String(f.value).replace(/\D/g, '');
+      if (d.charAt(0) === '7' || d.charAt(0) === '8') d = d.slice(1);
+      f.value = renderPhone(d.slice(0, 10));
+    }
+    var field = f.closest('.krd-field');
+    if (field) field.classList.remove('is-invalid');
+  });
+  root.addEventListener('focusin', function (e) {
+    if (e.target.name === 'phone' && !e.target.value) e.target.value = '+7 ';
+  });
+  root.addEventListener('focusout', function (e) {
+    if (e.target.name === 'phone' && !phoneDigits(e.target.value)) e.target.value = '';
+  });
+
+  /* ---------- сбор заявки ---------- */
+  function collect(form) {
+    var payload = { formName: form.getAttribute('data-krd-form') || 'Заявка с сайта' };
+    var lines = [];
+    var groups = {};
+    form.querySelectorAll('input, textarea, select').forEach(function (f) {
+      if (!f.name || f.type === 'submit') return;
+      if (f.type === 'checkbox' || f.type === 'radio') {
+        if (!f.checked) return;
+        var box = f.closest('[data-label]');
+        var label = box ? box.getAttribute('data-label') : f.name;
+        if (!groups[label]) { groups[label] = []; lines.push({ group: label }); }
+        groups[label].push(f.value);
+        return;
+      }
+      var v = String(f.value || '').trim();
+      if (!v) return;
+      if (f.name === 'name' || f.name === 'phone' || f.name === 'email') { payload[f.name] = v; return; }
+      lines.push({ text: (f.getAttribute('data-label') || f.name) + ': ' + v });
+    });
+    payload.details = lines.map(function (l) {
+      return l.group ? l.group + ': ' + groups[l.group].join(', ') : l.text;
+    }).join('\n');
+    return payload;
+  }
+
+  function validate(form) {
+    var bad = null;
+    form.querySelectorAll('[required]').forEach(function (f) {
+      var empty = !String(f.value || '').trim();
+      if (f.name === 'phone') empty = phoneDigits(f.value).length !== 10;
+      if (empty) {
+        var field = f.closest('.krd-field');
+        if (field) field.classList.add('is-invalid');
+        if (!bad) bad = f;
+      }
+    });
+    if (bad) {
+      bad.focus();
+      if (bad.name === 'phone' && phoneDigits(bad.value).length) showToast(CFG.phoneText);
+      return false;
+    }
+    return true;
+  }
+
+  /* ---------- форма-приёмник Тильды ---------- */
+  function findDonor() {
+    var forms = document.querySelectorAll(CFG.donorSelector);
+    for (var i = 0; i < forms.length; i++) {
+      if (!forms[i].closest('.vb-krd')) return forms[i];
+    }
+    return null;
+  }
+
+  function hideDonor(donor) {
+    // без этого Тильда покажет поверх своё окно «Спасибо»
+    donor.removeAttribute('data-success-popup');
+    donor.querySelectorAll('[data-success-popup]').forEach(function (n) { n.removeAttribute('data-success-popup'); });
+    var rec = donor.closest('.r') || donor.closest('[id^="rec"]') || donor;
+    if (rec.getAttribute('data-krd-hidden')) return;
+    rec.setAttribute('data-krd-hidden', '1');
+    rec.style.cssText += ';position:absolute!important;left:-9999px!important;top:0!important;' +
+      'width:1px!important;height:1px!important;overflow:hidden!important;';
+    rec.setAttribute('aria-hidden', 'true');
+  }
+
+  var ALIASES = { name: ['name', 'имя', 'fio'], phone: ['phone', 'tel', 'телефон'], email: ['email', 'mail', 'почта'] };
+  function matchField(donor, key) {
+    var inputs = donor.querySelectorAll('input, textarea');
+    for (var i = 0; i < inputs.length; i++) {
+      var f = inputs[i];
+      if (f.type === 'hidden' || f.type === 'submit' || f.type === 'checkbox') continue;
+      var hay = ((f.name || '') + ' ' + (f.placeholder || '')).toLowerCase();
+      for (var j = 0; j < ALIASES[key].length; j++) if (hay.indexOf(ALIASES[key][j]) !== -1) return f;
+    }
+    return null;
+  }
+
+  function setHidden(donor, name, value) {
+    var input = donor.querySelector('input[type="hidden"][name="' + name + '"]');
+    if (!input) {
+      input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      donor.appendChild(input);
+    }
+    input.value = value == null ? '' : String(value);
+  }
+
+  function fire(f) {
+    f.dispatchEvent(new Event('input', { bubbles: true }));
+    f.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // Поле «Телефон» Тильды — виджет с маской: видимое поле без кода страны и скрытое Phone
+  // вида «+7 (926) 535-24-47» (Тильда проверяет длину ≥ 18 символов).
+  function fillPhone(donor, value) {
+    var sel = '.t-input-phonemask, [name^="tildaspec-phone-part"]:not([type="hidden"])';
+    var visible = donor.querySelector(sel);
+    if (!visible) return false;
+    if (typeof window.t_form_phonemask_do === 'function' && visible.getAttribute('data-phonemask-iso') !== 'ru') {
+      var rec = donor.closest('[id^="rec"]');
+      var holder = donor.querySelector('[data-input-lid]');
+      try {
+        if (rec && holder) window.t_form_phonemask_do(rec.id.replace('rec', ''), holder.getAttribute('data-input-lid'), 'ru');
+      } catch (e) { /* маска останется как есть */ }
+      visible = donor.querySelector(sel) || visible;
+    }
+    var digits = phoneDigits(value);
+    var template = visible.getAttribute('data-phonemask-without-code') || '(000) 000-00-00';
+    var code = visible.getAttribute('data-phonemask-code') || '+7';
+    var formatted = '', k = 0;
+    for (var i = 0; i < template.length && k < digits.length; i++) {
+      formatted += template.charAt(i) === '0' ? digits.charAt(k++) : template.charAt(i);
+    }
+    visible.value = formatted;
+    visible.dispatchEvent(new Event('input', { bubbles: true }));
+    visible.value = formatted; // маска могла переписать по-своему
+    var result = donor.querySelector('.js-phonemask-result, input[type="hidden"][name="Phone"]');
+    if (result) { result.value = code + ' ' + formatted; result.dispatchEvent(new Event('change', { bubbles: true })); }
+    return true;
+  }
+
+  function fillDonor(donor, p) {
+    var phoneDone = p.phone && fillPhone(donor, p.phone);
+    ['name', 'phone', 'email'].forEach(function (key) {
+      if (!p[key] || (key === 'phone' && phoneDone)) return;
+      var f = matchField(donor, key);
+      if (f) { f.value = p[key]; fire(f); }
+      else setHidden(donor, key === 'name' ? 'Name' : key === 'phone' ? 'Phone' : 'Email', p[key]);
+    });
+    setHidden(donor, 'Форма', p.formName);
+    setHidden(donor, 'Страница', document.title + ' — ' + location.pathname);
+    setHidden(donor, 'Детали', p.details || '—');
+    // свои обязательные поля приёмника (галка согласия, e-mail) посетитель не видит — закрываем их
+    donor.querySelectorAll('[required], .js-tilda-rule').forEach(function (f) {
+      if (f.type === 'checkbox' || f.type === 'radio') {
+        if (!f.checked) { f.checked = true; f.dispatchEvent(new Event('change', { bubbles: true })); }
+        return;
+      }
+      if (f.value) return;
+      f.value = f.type === 'email' || /mail/i.test(f.name) ? CFG.fillerEmail : (p.formName || 'Заявка');
+      fire(f);
+    });
+  }
+
+  function tildaError(donor) {
+    var box = donor.querySelector('.js-rule-error-all, .js-errorbox-all');
+    return (box && box.textContent.trim()) || 'причина не указана';
+  }
+
+  // Тильда отправляет форму по клику на её кнопку; ход отправки виден в button.tildaSendingStatus:
+  // «1» — идёт отправка, «0» — не прошла проверка полей.
+  function submitViaTilda(donor, payload) {
+    return new Promise(function (resolve, reject) {
+      fillDonor(donor, payload);
+      var button = donor.querySelector('[type="submit"]');
+      if (!button) { console.error('[krd] В форме-приёмнике нет кнопки отправки', donor); reject(new Error('no-submit')); return; }
+      var settled = false, timer;
+      function guard(e) { if (e.target === donor) e.preventDefault(); }
+      function cleanup() {
+        donor.removeEventListener('tildaform:aftersuccess', ok);
+        donor.removeEventListener('tildaform:aftererror', err);
+        document.removeEventListener('submit', guard, true);
+        clearTimeout(timer);
+      }
+      function ok() { if (settled) return; settled = true; cleanup(); resolve(); }
+      function fail(msg) {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        window.KRD_LAST_ERROR = msg;
+        console.error('[krd] ' + msg, donor);
+        reject(new Error(msg));
+      }
+      function err() { fail('Тильда сообщила об ошибке: ' + tildaError(donor)); }
+      document.addEventListener('submit', guard, true);
+      donor.addEventListener('tildaform:aftersuccess', ok);
+      donor.addEventListener('tildaform:aftererror', err);
+      donor.removeAttribute('data-success-popup');
+      button.tildaSendingStatus = '';
+      button.click();
+      setTimeout(function () {
+        if (settled) return;
+        var st = button.tildaSendingStatus;
+        if (st === '1') return; // отправка идёт, ждём событие
+        if (st === '0') { fail('Тильда не приняла поля: ' + tildaError(donor)); return; }
+        fail('Форма-приёмник есть, но Тильда её не обслуживает — проверьте, что страница опубликована и у формы подключён приёмник данных.');
+      }, 60);
+      timer = setTimeout(function () {
+        fail('Тильда не подтвердила отправку за ' + (CFG.submitTimeout / 1000) + ' с');
+      }, CFG.submitTimeout);
+    });
+  }
+
+  function isDemoHost() {
+    return location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$|\.github\.io$/.test(location.hostname);
+  }
+
+  function send(payload) {
+    var donor = findDonor();
+    if (donor) { hideDonor(donor); return submitViaTilda(donor, payload); }
+    if (isDemoHost()) {
+      console.info('[krd] Демо: формы Тильды на странице нет, заявка не отправлена', payload);
+      return new Promise(function (r) { setTimeout(r, 600); });
+    }
+    console.error('[krd] Заявка никуда не ушла: добавьте на страницу блок с формой Тильды и подключите приёмник данных.', payload);
+    return Promise.reject(new Error('no-donor'));
+  }
+
+  // приёмник прячем сразу, а не при первой заявке
+  var early = findDonor();
+  if (early) hideDonor(early);
+  else document.addEventListener('DOMContentLoaded', function () { var d = findDonor(); if (d) hideDonor(d); });
+
+  root.querySelectorAll('form[data-krd-form]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (form.getAttribute('data-krd-busy') === '1') return;
+      if (!validate(form)) return;
+      var button = form.querySelector('[type="submit"]');
+      var label = button ? button.textContent : '';
+      form.setAttribute('data-krd-busy', '1');
+      if (button) { button.disabled = true; button.textContent = 'Отправляем…'; }
+      send(collect(form)).then(function () {
+        var pop = form.closest('.krd-pop');
+        if (pop) pop.classList.add('is-done');
+        form.reset();
+      }).catch(function () {
+        showToast(CFG.errorText);
+      }).then(function () {
+        form.removeAttribute('data-krd-busy');
+        if (button) { button.disabled = false; button.textContent = label; }
+      });
+    });
+  });
+
+  window.KRD_POPUP = { open: open, close: close };
+})();
