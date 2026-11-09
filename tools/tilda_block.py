@@ -71,6 +71,26 @@ def fix_urls(text):
 
 # ---------- разметка ----------
 src = read('index.html')
+
+# Режим страницы документа: python tools/tilda_block.py --doc policy
+# Шапка и подвал — из главной, между ними текст из tilda/_doc_<имя>.html (его пишет tools/docs_pages.py),
+# из поп-апов остаётся только плашка cookie.
+DOC = sys.argv[sys.argv.index('--doc') + 1] if '--doc' in sys.argv else None
+OUT_NAME, PREVIEW_NAME, SECTION_NAME = 'kordstar-main.html', 'preview.html', 'Главная Кордстар'
+if DOC:
+    SECTION_ID = 'vb-krd-' + DOC
+    OUT_NAME, PREVIEW_NAME, SECTION_NAME = DOC + '.html', DOC + '-preview.html', 'Документ Кордстар: ' + DOC
+    fragment = read('tilda/_doc_%s.html' % DOC)
+    head_from = src.index('<div id="rec3443015601"')      # шапка (десктоп), шапка (телефон), подменю
+    head_to = src.index('<div id="rec3719020401"')        # первый экран главной — уже не шапка
+    foot_from = src.index('<div id="rec3443017301"')      # подвал
+    pops_from = src.index('<!-- Поп-апы заявок')
+    pops_to = src.index('<!-- /поп-апы -->')
+    pops = src[pops_from:pops_to]
+    cookie = pops[pops.index('<div class="krd-cookie"'):]
+    cookie = cookie[:cookie.index('</div>') + len('</div>')]
+    src = (src[:head_from] + src[head_from:head_to] + fragment + '\n' + src[foot_from:pops_from]
+           + '<div class="vb-krd krd-pops" id="krd-pops">\n' + cookie + '\n</div>\n' + src[pops_to:])
 doc = LH.fromstring(src)
 body = re.search(r'<!--allrecords-->\s*(<div id="allrecords".*?)<script src="js/main.js">', src, re.S).group(1)
 inner = re.sub(r'^<div id="allrecords"[^>]*>', '', body.strip())
@@ -100,6 +120,9 @@ def strip_pseudo(sel):
     # классы, которые добавляет скрипт, в исходной разметке ещё нет — не требуем их
     s = re.sub(r'\.([\w-]+)', lambda m: '' if m.group(1) in js_words else m.group(0), s)
     s = re.sub(r'\s*([>+~])\s*(?=[>+~,]|$)', ' ', s)          # висящие комбинаторы
+    # «a + b» -> «a+b»: иначе пробел рядом с + принимается за пустой селектор, и правило
+    # вроде «input:checked + span» выкидывалось как неиспользуемое
+    s = re.sub(r'\s*([>+~])\s*', r'\1', s)
     s = re.sub(r'(^|[\s>+~])(?=[\s>+~]|$)', r'\1*', s)          # пустые составные -> *
     s = re.sub(r'\s+', ' ', s).strip()
     return s or '*'
@@ -321,14 +344,14 @@ for a, b in (('data-elem-id', 'data-ei'), ('data-group-id', 'data-gi'), ('data-e
     markup, css, js_out = markup.replace(a, b), css.replace(a, b), js_out.replace(a, b)
 
 code = (
-    '<section id="%s" class="vb-krd" data-section-name="Главная Кордстар" '
-    'data-vibeblock-unique-section="yes" aria-label="Кордстар — главная">\n%s\n</section>\n'
+    '<section id="%s" class="vb-krd" data-section-name="%s" '
+    'data-vibeblock-unique-section="yes" aria-label="%s">\n%s\n</section>\n'
     '<style>\n%s\n</style>\n'
     '<script>\n(function () {\n%s\n})();\n</script>\n'
-) % (SECTION_ID, markup.strip(), css, js_out.strip())
+) % (SECTION_ID, SECTION_NAME, SECTION_NAME, markup.strip(), css, js_out.strip())
 
 os.makedirs(OUT, exist_ok=True)
-open(os.path.join(OUT, 'kordstar-main.html'), 'w', encoding='utf-8', newline='\n').write(code)
+open(os.path.join(OUT, OUT_NAME), 'w', encoding='utf-8', newline='\n').write(code)
 
 # превью: «страница Тильды» с одним вайб-блоком
 preview = ('<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">'
@@ -338,12 +361,12 @@ preview = ('<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">'
            '--t-text-font:"Montserrat",Arial,sans-serif}*{box-sizing:content-box}</style></head>'
            '<body class="t-body"><div id="allrecords" class="t-records">'
            '<div id="rec999" class="r t-rec" data-record-type="1370">\n%s</div></div></body></html>') % code
-open(os.path.join(OUT, 'preview.html'), 'w', encoding='utf-8', newline='\n').write(preview)
+open(os.path.join(OUT, PREVIEW_NAME), 'w', encoding='utf-8', newline='\n').write(preview)
 
 size = len(code.encode('utf-8'))
 print('CSS правил оставлено: %d, выброшено: %d' % (stats['kept'], stats['dropped']))
 print('Разметка: %d КБ, CSS: %d КБ, JS: %d КБ' % (len(markup.encode()) // 1024, len(css.encode()) // 1024, len(js_out.encode()) // 1024))
-print('Код блока: %d КБ (лимит Тильды %d КБ) -> tilda/kordstar-main.html' % (size // 1024, LIMIT // 1024))
+print('Код блока: %d КБ (лимит Тильды %d КБ) -> tilda/%s' % (size // 1024, LIMIT // 1024, OUT_NAME))
 if MISSING:
     print('Нет на CDN Тильды, взяты с GitHub Pages:', ', '.join(sorted(MISSING)))
 if size > LIMIT:

@@ -2217,7 +2217,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // без галочки поп-ап заявку не отправляет, так что сюда доходят только согласившиеся
     setHidden(donor, 'Согласие', 'Да — на обработку ПДн и с политикой конфиденциальности');
     // свои обязательные поля приёмника (галка согласия, e-mail) посетитель не видит — закрываем их
-    donor.querySelectorAll('[required], .js-tilda-rule').forEach(function (f) {
+    // только обязательные: необязательное «Имя» оставляем пустым — Тильда пустое не проверяет
+    donor.querySelectorAll('[required], [data-tilda-req="1"]').forEach(function (f) {
       if (f.type === 'checkbox' || f.type === 'radio') {
         if (!f.checked) { f.checked = true; f.dispatchEvent(new Event('change', { bubbles: true })); }
         return;

@@ -2,11 +2,13 @@
 """Страницы «Политика конфиденциальности» (/policy) и «Согласие на обработку ПДн» (/soglasie).
 
 Запуск:  python tools/docs_pages.py
-Пишет код вайб-блоков tilda/policy.html и tilda/soglasie.html (по одному блоку на страницу Тильды)
-и превью tilda/policy-preview.html, tilda/soglasie-preview.html.
+Пишет текст документов в tilda/_doc_*.html и собирает через tools/tilda_block.py --doc
+вайб-блоки tilda/policy.html и tilda/soglasie.html — с шапкой и подвалом главной.
 Реквизиты оператора — только то, что есть в подвале сайта (без ИНН и ОГРН).
 """
 import os
+import subprocess
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'tilda')
@@ -18,7 +20,6 @@ PHONE = '+7 (495) 150-92-22'
 PHONE_HREF = '+74951509222'
 SITE = 'cordstar.ru'
 DATE = '09.11.2026'
-LOGO = 'https://optim.tildacdn.com/tild3138-3133-4466-b364-353837636662/-/format/webp/image.png.webp'
 
 CONTACTS = ('{c}, адрес: {a}, e-mail: <a href="mailto:{e}">{e}</a>, телефон: '
             '<a href="tel:{ph}">{p}</a>').format(c=COMPANY, a=ADDRESS, e=EMAIL, ph=PHONE_HREF, p=PHONE)
@@ -109,35 +110,27 @@ CONSENT = [
 ]
 
 CSS = """
-.vb-krd-doc{display:block;background:#f4f8f9;color:#203133;font-family:"Montserrat",Arial,sans-serif;-webkit-font-smoothing:antialiased}
-.vb-krd-doc *,.vb-krd-doc *::before,.vb-krd-doc *::after{box-sizing:border-box}
-.vb-krd-doc .kd-top{background:#fff;border-bottom:1px solid #d9e4e6}
-.vb-krd-doc .kd-top__in{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.vb-krd-doc .kd-logo img{display:block;height:56px;width:auto}
-.vb-krd-doc .kd-back{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid rgba(101,149,155,.4);border-radius:30px;color:#457c82;font-size:14px;font-weight:500;text-decoration:none;transition:background-color .2s ease}
-.vb-krd-doc .kd-back:hover{background:#f4f8f9}
-.vb-krd-doc .kd-wrap{max-width:880px;margin:0 auto;padding:56px 24px 88px}
-.vb-krd-doc .kd-card{background:#fff;border-radius:24px;padding:48px 56px}
-.vb-krd-doc .kd-kicker{margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#69979c}
-.vb-krd-doc h1{margin:0 0 12px;font-family:"Montserrat",Arial,sans-serif;font-size:36px;line-height:1.15;font-weight:600;color:#203133}
-.vb-krd-doc .kd-date{margin:0 0 32px;font-size:14px;color:#5f7375}
-.vb-krd-doc h2{margin:36px 0 14px;font-family:"Montserrat",Arial,sans-serif;font-size:20px;line-height:1.3;font-weight:600;color:#203133}
-.vb-krd-doc p{margin:0 0 12px;font-size:16px;line-height:1.65;color:#203133}
-.vb-krd-doc ul{margin:0 0 12px;padding:0 0 0 22px}
-.vb-krd-doc li{margin:0 0 8px;font-size:16px;line-height:1.65;color:#203133}
-.vb-krd-doc li::marker{color:#457c82}
-.vb-krd-doc a{color:#457c82;text-decoration:underline;text-underline-offset:2px}
-.vb-krd-doc a[href^="tel:"]{white-space:nowrap}
-.vb-krd-doc .kd-foot{margin-top:40px;padding-top:24px;border-top:1px solid #d9e4e6;font-size:14px;line-height:1.6;color:#5f7375}
+.vb-krd .vb-krd-doc{display:block;background:#f4f8f9;color:#203133;font-family:"Montserrat",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.vb-krd .vb-krd-doc *,.vb-krd .vb-krd-doc *::before,.vb-krd .vb-krd-doc *::after{box-sizing:border-box}
+.vb-krd .vb-krd-doc .kd-wrap{max-width:880px;margin:0 auto;padding:140px 24px 88px}
+.vb-krd .vb-krd-doc .kd-card{background:#fff;border-radius:24px;padding:48px 56px}
+.vb-krd .vb-krd-doc .kd-kicker{margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#69979c}
+.vb-krd .vb-krd-doc h1{margin:0 0 12px;font-family:"Montserrat",Arial,sans-serif;font-size:36px;line-height:1.15;font-weight:600;color:#203133}
+.vb-krd .vb-krd-doc .kd-date{margin:0 0 32px;font-size:14px;color:#5f7375}
+.vb-krd .vb-krd-doc h2{margin:36px 0 14px;font-family:"Montserrat",Arial,sans-serif;font-size:20px;line-height:1.3;font-weight:600;color:#203133}
+.vb-krd .vb-krd-doc p{margin:0 0 12px;font-size:16px;line-height:1.65;color:#203133}
+.vb-krd .vb-krd-doc ul{margin:0 0 12px;padding:0 0 0 22px}
+.vb-krd .vb-krd-doc li{margin:0 0 8px;font-size:16px;line-height:1.65;color:#203133}
+.vb-krd .vb-krd-doc li::marker{color:#457c82}
+.vb-krd .vb-krd-doc a{color:#457c82;text-decoration:underline;text-underline-offset:2px}
+.vb-krd .vb-krd-doc a[href^="tel:"]{white-space:nowrap}
+.vb-krd .vb-krd-doc .kd-foot{margin-top:40px;padding-top:24px;border-top:1px solid #d9e4e6;font-size:14px;line-height:1.6;color:#5f7375}
 @media (max-width:640px){
-.vb-krd-doc .kd-top__in{padding:12px 16px}
-.vb-krd-doc .kd-logo img{height:44px}
-.vb-krd-doc .kd-back{padding:8px 14px;font-size:13px}
-.vb-krd-doc .kd-wrap{padding:24px 12px 56px}
-.vb-krd-doc .kd-card{padding:28px 20px;border-radius:20px}
-.vb-krd-doc h1{font-size:26px}
-.vb-krd-doc h2{font-size:18px;margin-top:28px}
-.vb-krd-doc p,.vb-krd-doc li{font-size:15px}
+.vb-krd .vb-krd-doc .kd-wrap{padding:100px 12px 56px}
+.vb-krd .vb-krd-doc .kd-card{padding:28px 20px;border-radius:20px}
+.vb-krd .vb-krd-doc h1{font-size:26px}
+.vb-krd .vb-krd-doc h2{font-size:18px;margin-top:28px}
+.vb-krd .vb-krd-doc p,.vb-krd .vb-krd-doc li{font-size:15px}
 }
 """
 
@@ -156,34 +149,24 @@ def sections(items, as_list):
 
 
 def page(sid, kicker, title, body):
+    # только текст документа: шапку и подвал добавляет tools/tilda_block.py --doc (как на главной)
     return (
-        '<section id="%s" class="vb-krd-doc" data-vibeblock-unique-section="yes" aria-label="%s">\n'
-        '<header class="kd-top"><div class="kd-top__in">'
-        '<a class="kd-logo" href="/" aria-label="Кордстар — на главную"><img src="%s" alt="Кордстар"></a>'
-        '<a class="kd-back" href="/">← На главную</a></div></header>\n'
+        '<div id="%s" class="vb-krd-doc">\n'
         '<main class="kd-wrap"><article class="kd-card">\n'
         '<p class="kd-kicker">%s</p><h1>%s</h1><p class="kd-date">Редакция от %s</p>\n%s\n'
         '<div class="kd-foot">%s</div>\n'
-        '</article></main>\n</section>\n<style>\n%s%s\n</style>\n'
-    ) % (sid, title, LOGO, kicker, title, DATE, body, 'Оператор: ' + CONTACTS, FONTS, CSS.strip())
-
-
-def preview(code, title):
-    return ('<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">'
-            '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-            '<meta name="robots" content="noindex, nofollow"><title>%s</title>'
-            '<style>body{margin:0}</style></head><body>\n%s</body></html>') % (title, code)
+        '</article></main>\n</div>\n<style>\n%s%s\n</style>\n'
+    ) % (sid, kicker, title, DATE, body, 'Оператор: ' + CONTACTS, FONTS, CSS.strip())
 
 
 docs = {
-    'policy': page('vb-krd-policy', 'Документы', 'Политика конфиденциальности', sections(POLICY, True)),
-    'soglasie': page('vb-krd-consent', 'Документы', 'Согласие на обработку персональных данных',
+    'policy': page('kd-policy', 'Документы', 'Политика конфиденциальности', sections(POLICY, True)),
+    'soglasie': page('kd-consent', 'Документы', 'Согласие на обработку персональных данных',
                      '\n'.join('<p>%s</p>' % p for p in CONSENT_INTRO) + '\n' + sections(CONSENT, False)),
 }
-titles = {'policy': 'Политика конфиденциальности', 'soglasie': 'Согласие на обработку персональных данных'}
 
 os.makedirs(OUT, exist_ok=True)
 for name, code in docs.items():
-    open(os.path.join(OUT, name + '.html'), 'w', encoding='utf-8', newline='\n').write(code)
-    open(os.path.join(OUT, name + '-preview.html'), 'w', encoding='utf-8', newline='\n').write(preview(code, titles[name]))
-    print('%s: %d КБ -> tilda/%s.html' % (titles[name], len(code.encode()) // 1024, name))
+    open(os.path.join(OUT, '_doc_%s.html' % name), 'w', encoding='utf-8', newline='\n').write(code)
+    print('== %s' % name)
+    subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'tilda_block.py'), '--doc', name], check=True)
