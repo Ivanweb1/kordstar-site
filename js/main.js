@@ -2067,6 +2067,10 @@ document.addEventListener("DOMContentLoaded", function() {
     var field = f.closest('.krd-field');
     if (field) field.classList.remove('is-invalid');
   });
+  root.addEventListener('change', function (e) {
+    var agree = e.target.closest && e.target.closest('.krd-agree');
+    if (agree) agree.classList.remove('is-invalid');
+  });
   root.addEventListener('focusin', function (e) {
     if (e.target.name === 'phone' && !e.target.value) e.target.value = '+7 ';
   });
@@ -2080,7 +2084,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var lines = [];
     var groups = {};
     form.querySelectorAll('input, textarea, select').forEach(function (f) {
-      if (!f.name || f.type === 'submit') return;
+      if (!f.name || f.type === 'submit' || f.hasAttribute('data-krd-skip')) return;
       if (f.type === 'checkbox' || f.type === 'radio') {
         if (!f.checked) return;
         var box = f.closest('[data-label]');
@@ -2105,8 +2109,9 @@ document.addEventListener("DOMContentLoaded", function() {
     form.querySelectorAll('[required]').forEach(function (f) {
       var empty = !String(f.value || '').trim();
       if (f.name === 'phone') empty = phoneDigits(f.value).length !== 10;
+      if (f.type === 'checkbox') empty = !f.checked;
       if (empty) {
-        var field = f.closest('.krd-field');
+        var field = f.closest('.krd-field, .krd-agree');
         if (field) field.classList.add('is-invalid');
         if (!bad) bad = f;
       }
@@ -2114,6 +2119,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (bad) {
       bad.focus();
       if (bad.name === 'phone' && phoneDigits(bad.value).length) showToast(CFG.phoneText);
+      if (bad.type === 'checkbox') showToast('Отметьте согласие на обработку персональных данных');
       return false;
     }
     return true;
@@ -2208,6 +2214,8 @@ document.addEventListener("DOMContentLoaded", function() {
     setHidden(donor, 'Форма', p.formName);
     setHidden(donor, 'Страница', document.title + ' — ' + location.pathname);
     setHidden(donor, 'Детали', p.details || '—');
+    // без галочки поп-ап заявку не отправляет, так что сюда доходят только согласившиеся
+    setHidden(donor, 'Согласие', 'Да — на обработку ПДн и с политикой конфиденциальности');
     // свои обязательные поля приёмника (галка согласия, e-mail) посетитель не видит — закрываем их
     donor.querySelectorAll('[required], .js-tilda-rule').forEach(function (f) {
       if (f.type === 'checkbox' || f.type === 'radio') {
