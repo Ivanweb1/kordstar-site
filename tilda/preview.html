@@ -1974,9 +1974,26 @@ document.addEventListener("DOMContentLoaded", function() {
   function isDemoHost() {
     return location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$|\.github\.io$/.test(location.hostname);
   }
+  // Тильда вешает обработчик на блок формы только после загрузки своего скрипта форм
+  // (window.initForms[rec.id]). Если нажать раньше, клик уйдёт в пустоту — ждём до 30 с.
+  function whenTildaReady(donor) {
+    var rec = donor.closest('[id^="rec"]');
+    var id = rec && rec.id;
+    return new Promise(function (resolve) {
+      var waited = 0;
+      (function check() {
+        if (!id || (window.initForms && window.initForms[id] && window.tildaForm) || waited >= 30000) { resolve(); return; }
+        waited += 250;
+        setTimeout(check, 250);
+      })();
+    });
+  }
   function send(payload) {
     var donor = findDonor();
-    if (donor) { hideDonor(donor); return submitViaTilda(donor, payload); }
+    if (donor) {
+      hideDonor(donor);
+      return whenTildaReady(donor).then(function () { return submitViaTilda(donor, payload); });
+    }
     if (isDemoHost()) {
       console.info('[krd] Демо: формы Тильды на странице нет, заявка не отправлена', payload);
       return new Promise(function (r) { setTimeout(r, 600); });
