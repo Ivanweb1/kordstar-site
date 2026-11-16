@@ -104,13 +104,12 @@ def card(cat, title, text, button, popup, rank):
     return (
         '<article class="kc-card%s" data-kc-cat="%s" data-kc-name="%s" data-kc-rank="%d">'
         '<div class="kc-card__ph"><img src="%s" alt="" width="72" height="72" loading="lazy"></div>'
-        '<p class="kc-card__cat">%s</p>'
         '<h3 class="kc-card__title">%s</h3>'
         '<p class="kc-card__text">%s</p>'
         '<p class="kc-card__price">%s</p>'
         '<button class="kc-card__btn" type="button" data-krd-popup="%s" data-kc-product="%s">%s</button>'
         '</article>'
-    ) % ('' if popup == 'order' else ' kc-card--wide', cid, E(title.lower()), rank, icon, E(cname), E(title), E(text),
+    ) % ('' if popup == 'order' else ' kc-card--wide', cid, E(title.lower()), rank, icon, E(title), E(text),
          PRICE if popup == 'order' else 'Ответ за 30 минут', popup, E(title if popup == 'order' else cname), button)
 
 
@@ -222,7 +221,7 @@ CSS = """
 display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 100%);color:var(--kc-ink);font-family:"Inter","Montserrat",Arial,sans-serif;-webkit-font-smoothing:antialiased}
 .vb-krd .vb-krd-cat *,.vb-krd .vb-krd-cat *::before,.vb-krd .vb-krd-cat *::after{box-sizing:border-box}
 .vb-krd .vb-krd-cat button{font-family:inherit}
-.vb-krd .kc-wrap{max-width:1312px;margin:0 auto;padding:120px 32px 0}
+.vb-krd .kc-wrap{max-width:1200px;margin:0 auto;padding:104px 100px 0}
 .vb-krd .kc-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 28px;font-size:14px;color:var(--kc-muted)}
 .vb-krd .kc-crumbs a,.vb-krd .kc-crumbs button{color:var(--kc-muted);text-decoration:none;background:none;border:0;padding:0;font-size:14px;cursor:pointer}
 .vb-krd .kc-crumbs a:hover,.vb-krd .kc-crumbs button:hover{color:var(--kc-accent)}
@@ -250,9 +249,9 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-sort select{height:44px;padding:0 44px 0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font:inherit;font-size:14px;color:var(--kc-ink);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none}
 .vb-krd .kc-sort select:focus{border-color:var(--kc-accent-2)}
 .vb-krd .kc-sort::after{content:"";position:absolute;right:20px;top:17px;width:7px;height:7px;border-right:2px solid var(--kc-accent);border-bottom:2px solid var(--kc-accent);transform:rotate(45deg);pointer-events:none}
-.vb-krd .kc-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:start}
+.vb-krd .kc-layout{display:grid;grid-template-columns:256px minmax(0,1fr);gap:24px;align-items:start}
 .vb-krd .kc-list{min-width:0}
-.vb-krd .kc-side{position:sticky;top:110px;background:#fff;border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(32,64,67,.05)}
+.vb-krd .kc-side{position:sticky;top:96px;background:#fff;border-radius:24px;padding:20px 16px;box-shadow:0 10px 30px rgba(32,64,67,.05)}
 .vb-krd .kc-side__title{margin:0 0 14px;font-family:"Montserrat",Arial,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--kc-head)}
 .vb-krd .kc-side ul{list-style:none;margin:0;padding:0}
 .vb-krd .kc-side li+li{margin-top:2px}
@@ -267,20 +266,18 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-group__title{margin:0 0 6px;font-family:"Montserrat",Arial,sans-serif;font-size:22px;line-height:1.2;font-weight:700;color:var(--kc-head)}
 .vb-krd .kc-group__count{display:inline-block;vertical-align:middle;margin-left:6px;padding:3px 10px;border-radius:20px;background:#fff;font-family:"Inter",Arial,sans-serif;font-size:12px;font-weight:500;color:var(--kc-muted)}
 .vb-krd .kc-group__lead{margin:0;font-size:14px;line-height:1.4;color:rgba(32,49,51,.8)}
-.vb-krd .kc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.vb-krd .kc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .vb-krd .kc-card{display:flex;flex-direction:column;background:#fff;border-radius:24px;padding:12px 12px 16px;box-shadow:0 10px 30px rgba(32,64,67,.05);transition:box-shadow .25s,transform .25s}
 .vb-krd .kc-card:hover{box-shadow:0 18px 40px rgba(32,64,67,.12);transform:translateY(-2px)}
 .vb-krd .kc-card__ph{display:flex;align-items:center;justify-content:center;aspect-ratio:5/4;margin:0 0 16px;border-radius:16px;background:radial-gradient(120% 100% at 50% 0%,#f3f9f9 0%,#e3eff0 100%)}
 .vb-krd .kc-card__ph img{width:88px;height:88px;border-radius:22px;background:#fff;box-shadow:0 10px 26px rgba(32,64,67,.12)}
-.vb-krd .kc-card--wide{grid-column:1/-1;display:grid;grid-template-columns:200px 1fr auto;grid-template-rows:auto auto 1fr auto;column-gap:28px;align-items:start;padding:12px 32px 12px 12px}
-.vb-krd .kc-card--wide .kc-card__ph{grid-row:1/5;aspect-ratio:auto;height:100%;min-height:160px;margin:0}
-.vb-krd .kc-card--wide .kc-card__cat{grid-column:2;margin-top:24px}
-.vb-krd .kc-card--wide .kc-card__title{grid-column:2;font-size:20px}
+.vb-krd .kc-card--wide{grid-column:1/-1;display:grid;grid-template-columns:200px 1fr auto;grid-template-rows:auto auto 1fr;column-gap:28px;align-items:start;padding:12px 32px 12px 12px}
+.vb-krd .kc-card--wide .kc-card__ph{grid-row:1/4;aspect-ratio:auto;height:100%;min-height:160px;margin:0}
+.vb-krd .kc-card--wide .kc-card__title{grid-column:2;margin-top:24px;font-size:20px}
 .vb-krd .kc-card--wide .kc-card__text{grid-column:2;max-width:520px}
 .vb-krd .kc-card--wide .kc-card__price{grid-column:2;margin-top:0;margin-bottom:24px}
-.vb-krd .kc-card--wide .kc-card__btn{grid-column:3;grid-row:1/5;align-self:center;padding:0 32px;background:var(--kc-accent);border-color:var(--kc-accent);color:#fff}
+.vb-krd .kc-card--wide .kc-card__btn{grid-column:3;grid-row:1/4;align-self:center;padding:0 32px;background:var(--kc-accent);border-color:var(--kc-accent);color:#fff}
 .vb-krd .kc-card--wide .kc-card__btn:hover{background:#3a6a6f;border-color:#3a6a6f}
-.vb-krd .kc-card__cat{margin:0 4px 6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--kc-accent-2)}
 .vb-krd .kc-card__title{margin:0 4px 6px;font-family:"Inter",Arial,sans-serif;font-size:16px;line-height:1.35;font-weight:600;color:var(--kc-ink)}
 .vb-krd .kc-card__text{margin:0 4px 12px;font-size:14px;line-height:1.4;color:rgba(32,49,51,.8)}
 .vb-krd .kc-card__price{margin:auto 4px 14px;font-size:14px;font-weight:600;color:var(--kc-head)}
@@ -301,7 +298,7 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-pick{display:flex;flex-direction:column;gap:4px;margin:0;padding:14px 18px;border-radius:14px;background:#eef5f6}
 .vb-krd .kc-pick span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#69979c}
 .vb-krd .kc-pick b{font-size:16px;font-weight:600;line-height:1.35;color:#203133}
-@media (max-width:1199px){.vb-krd .kc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1199px){.vb-krd .kc-wrap{max-width:none;padding:110px 32px 0}}
 @media (max-width:959px){
 .vb-krd .kc-wrap{padding:100px 20px 0}
 .vb-krd .kc-layout{grid-template-columns:minmax(0,1fr)}
@@ -313,8 +310,8 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-tools{margin-bottom:28px}
 }
 @media (max-width:639px){
-.vb-krd .kc-wrap{padding:88px 16px 0}
-.vb-krd .kc-chips{margin:0 -16px 16px;padding:0 16px 4px}
+.vb-krd .kc-wrap{padding:88px 20px 0}
+.vb-krd .kc-chips{margin:0 -20px 16px;padding:0 20px 4px}
 .vb-krd .kc-title{font-size:26px}
 .vb-krd .kc-help{gap:6px}
 .vb-krd .kc-help button{height:36px;padding:0 12px;font-size:13px;gap:6px}
@@ -330,11 +327,10 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-card__ph img{width:64px;height:64px;border-radius:16px}
 .vb-krd .kc-card--wide{display:flex;align-items:stretch;padding:8px 8px 12px}
 .vb-krd .kc-card--wide .kc-card__ph{aspect-ratio:auto;min-height:120px;height:auto;margin-bottom:12px}
-.vb-krd .kc-card--wide .kc-card__cat{margin-top:0}
+.vb-krd .kc-card--wide .kc-card__title{margin-top:0}
 .vb-krd .kc-card--wide .kc-card__title{font-size:16px}
 .vb-krd .kc-card--wide .kc-card__price{margin-bottom:14px}
 .vb-krd .kc-card--wide .kc-card__btn{padding:0;align-self:stretch}
-.vb-krd .kc-card__cat{font-size:10px}
 .vb-krd .kc-card__title{font-size:14px}
 .vb-krd .kc-card__text{font-size:12px}
 .vb-krd .kc-card__price{font-size:13px}
@@ -358,6 +354,13 @@ JS = r"""
   var empty = root.querySelector('.kc-empty');
   var list = root.querySelector('.kc-list');
   var current = 'all';
+  var wrap = root.querySelector('.kc-wrap');
+  function fit() {
+    var w = document.documentElement.clientWidth;
+    wrap.style.zoom = w >= 1200 ? String(w / 1200) : '';
+  }
+  fit();
+  window.addEventListener('resize', fit);
 
   function apply() {
     var q = (search.value || '').trim().toLowerCase();
