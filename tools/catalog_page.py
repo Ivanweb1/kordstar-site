@@ -121,11 +121,12 @@ def groups():
             cards = ''.join(card(c, t, d, 'Предзаказ', 'order', i) for i, (t, d) in enumerate(items))
         else:
             cards = card(c, req[0], req[1], 'Оставить запрос', 'parts', 0)
+        heading = '<a href="/steel-ropes">Стальные канаты</a>' if cid == 'ropes' else E(cname)
         out.append(
             '<section class="kc-group" data-kc-group="%s">'
             '<div class="kc-group__head"><div><h2 class="kc-group__title">%s <span class="kc-group__count">%d</span></h2>'
             '<p class="kc-group__lead">%s</p></div></div>'
-            '<div class="kc-grid">%s</div></section>' % (cid, E(cname), count(c), E(lead), cards))
+            '<div class="kc-grid">%s</div></section>' % (cid, heading, count(c), E(lead), cards))
     return '\n'.join(out)
 
 
@@ -264,6 +265,8 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-group[hidden],.vb-krd .kc-card[hidden]{display:none}
 .vb-krd .kc-group__head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 20px}
 .vb-krd .kc-group__title{margin:0 0 6px;font-family:"Montserrat",Arial,sans-serif;font-size:22px;line-height:1.2;font-weight:700;color:var(--kc-head)}
+.vb-krd .kc-group__title a{color:inherit;text-decoration:none}
+.vb-krd .kc-group__title a:hover{color:var(--kc-accent)}
 .vb-krd .kc-group__count{display:inline-block;vertical-align:middle;margin-left:6px;padding:3px 10px;border-radius:20px;background:#fff;font-family:"Inter",Arial,sans-serif;font-size:12px;font-weight:500;color:var(--kc-muted)}
 .vb-krd .kc-group__lead{margin:0;font-size:14px;line-height:1.4;color:rgba(32,49,51,.8)}
 .vb-krd .kc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
