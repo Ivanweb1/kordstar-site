@@ -7,7 +7,9 @@
    показываем макет 1200, уменьшенный по ширине окна; его CSS-правила в css/page.css переведены на max-width: 959px. */
 (function () {
   // 480 пропускаем: ниже 640 везде телефонный макет (у Тильды макет 480–639 не доделан)
-  var BREAKS = [1200, 640, 320];
+  // макет 640 тоже не доделан — ниже 960 px везде телефонный макет (его правила в page.css — до 959 px)
+  var BREAKS = [1200, 320];
+  var TABLET_MAX_ZOOM = 1.6; // телефонный макет на планшете увеличиваем не больше чем в 1,6 раза — колонкой по центру
   function base() {
     for (var i = 0; i < BREAKS.length - 1; i++) {
       var min = BREAKS[i] === 1200 ? 960 : BREAKS[i];
@@ -28,13 +30,35 @@
     var w = document.documentElement.clientWidth;
     var b = base();
     // масштаб для собственных блоков (как у Zero-блоков от 1200px и шире)
-    document.documentElement.style.setProperty('--kz', w >= 960 ? w / 1200 : 1);
+    var root = document.documentElement;
+    root.style.setProperty('--kz', w >= 960 ? w / 1200 : 1);
+    // телефонный макет: до 1,6 раза, а если окно шире — колонка 320 × 1,6 по центру
+    var pz = Math.min(w / 320, TABLET_MAX_ZOOM);
+    var col = b === 320 && w - 320 * pz > 1 ? 320 * pz : 0;
+    if (col) {
+      root.style.setProperty('--krd-col', col + 'px');
+      root.style.setProperty('--krd-inset', 20 * pz + 'px');
+    } else {
+      root.style.removeProperty('--krd-col');
+      root.style.removeProperty('--krd-inset');
+    }
     document.querySelectorAll('.t396__artboard').forEach(function (ab) {
       // уже 1200 px макет 1200 уменьшаем всегда, иначе он не влезет в окно (в том числе шапка с upscale «grid»)
-      var z = attr(ab, 'upscale', b) === 'window' || (b === 1200 && w < 1200) ? w / b : 1;
+      var z = b === 320 ? pz : attr(ab, 'upscale', b) === 'window' || (b === 1200 && w < 1200) ? w / b : 1;
       ab.style.setProperty('--zoom', z);
       var rec = ab.closest('.r');
       if (rec) rec.style.setProperty('--zoom', z);
+      // колонка: сам артборд сужаем и ставим по центру, его фон растягиваем на всё окно через запись
+      ab.style.width = col ? col + 'px' : '';
+      ab.style.marginLeft = ab.style.marginRight = col ? 'auto' : '';
+      if (rec) {
+        if (col && !rec.hasAttribute('data-krd-bg')) {
+          ab.style.width = '';
+          rec.setAttribute('data-krd-bg', getComputedStyle(ab).backgroundColor);
+          ab.style.width = col + 'px';
+        }
+        rec.style.backgroundColor = col ? rec.getAttribute('data-krd-bg') : '';
+      }
       Array.prototype.forEach.call(ab.children, function (el) {
         if (el.classList.contains('t396__elem') || el.classList.contains('t396__group')) el.style.zoom = z === 1 ? '' : z;
       });
