@@ -2,13 +2,16 @@
    1–4: замена того, что делали скрипты Тильды (масштаб Zero-блоков, появление, меню, слайд команды).
    5–10: собственные скрипты страницы, перенесены без изменений логики. */
 
-/* 1. Масштаб Zero-блоков: макет нарисован под ширины 1200/960/640/480/320 и растягивается на ширину окна */
+/* 1. Масштаб Zero-блоков: макет нарисован под ширины 1200/960/640/480/320 и растягивается на ширину окна.
+   Макет 960 в Тильде не доделан (крупный текст, блоки уезжают за край), поэтому от 960 до 1199 px
+   показываем макет 1200, уменьшенный по ширине окна; его CSS-правила в css/page.css переведены на max-width: 959px. */
 (function () {
   // 480 пропускаем: ниже 640 везде телефонный макет (у Тильды макет 480–639 не доделан)
-  var BREAKS = [1200, 960, 640, 320];
+  var BREAKS = [1200, 640, 320];
   function base() {
     for (var i = 0; i < BREAKS.length - 1; i++) {
-      if (window.matchMedia('(min-width: ' + BREAKS[i] + 'px)').matches) return BREAKS[i];
+      var min = BREAKS[i] === 1200 ? 960 : BREAKS[i];
+      if (window.matchMedia('(min-width: ' + min + 'px)').matches) return BREAKS[i];
     }
     return 320;
   }
@@ -25,9 +28,10 @@
     var w = document.documentElement.clientWidth;
     var b = base();
     // масштаб для собственных блоков (как у Zero-блоков от 1200px и шире)
-    document.documentElement.style.setProperty('--kz', w >= 1200 ? w / 1200 : 1);
+    document.documentElement.style.setProperty('--kz', w >= 960 ? w / 1200 : 1);
     document.querySelectorAll('.t396__artboard').forEach(function (ab) {
-      var z = attr(ab, 'upscale', b) === 'window' ? w / b : 1;
+      // уже 1200 px макет 1200 уменьшаем всегда, иначе он не влезет в окно (в том числе шапка с upscale «grid»)
+      var z = attr(ab, 'upscale', b) === 'window' || (b === 1200 && w < 1200) ? w / b : 1;
       ab.style.setProperty('--zoom', z);
       var rec = ab.closest('.r');
       if (rec) rec.style.setProperty('--zoom', z);

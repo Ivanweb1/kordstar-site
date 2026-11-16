@@ -101,7 +101,6 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-pick{display:flex;flex-direction:column;gap:4px;margin:0;padding:14px 18px;border-radius:14px;background:#eef5f6}
 .vb-krd .kc-pick span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#69979c}
 .vb-krd .kc-pick b{font-size:16px;font-weight:600;line-height:1.35;color:#203133}
-@media (max-width:1199px){.vb-krd .kc-wrap{max-width:none;padding:110px 32px 0}}
 @media (max-width:959px){
 .vb-krd .kc-wrap{padding:100px 20px 0}
 .vb-krd .kc-layout{grid-template-columns:minmax(0,1fr)}
@@ -158,7 +157,7 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
   var wrap = root.querySelector('.kc-wrap');
   function fit() {
     var w = document.documentElement.clientWidth;
-    wrap.style.zoom = w >= 1200 ? String(w / 1200) : '';
+    wrap.style.zoom = w >= 960 && w !== 1200 ? String(w / 1200) : '';
   }
   fit();
   window.addEventListener('resize', fit);
