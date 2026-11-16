@@ -125,12 +125,8 @@ def groups():
         out.append(
             '<section class="kc-group" data-kc-group="%s">'
             '<div class="kc-group__head"><div><h2 class="kc-group__title">%s <span class="kc-group__count">%d</span></h2>'
-            '<p class="kc-group__lead">%s</p></div>%s</div>'
-            '<div class="kc-grid">%s</div></section>' % (
-                cid, E(cname), count(c), E(lead),
-                # «Только этот раздел» — где карточек больше одного ряда; у одной карточки кнопка лишняя
-                '<button class="kc-group__more" type="button" data-kc-show="%s">Только этот раздел</button>' % cid
-                if count(c) > 4 else '', cards))
+            '<p class="kc-group__lead">%s</p></div></div>'
+            '<div class="kc-grid">%s</div></section>' % (cid, E(cname), count(c), E(lead), cards))
     return '\n'.join(out)
 
 
@@ -271,10 +267,6 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-group__title{margin:0 0 6px;font-family:"Montserrat",Arial,sans-serif;font-size:22px;line-height:1.2;font-weight:700;color:var(--kc-head)}
 .vb-krd .kc-group__count{display:inline-block;vertical-align:middle;margin-left:6px;padding:3px 10px;border-radius:20px;background:#fff;font-family:"Inter",Arial,sans-serif;font-size:12px;font-weight:500;color:var(--kc-muted)}
 .vb-krd .kc-group__lead{margin:0;font-size:14px;line-height:1.4;color:rgba(32,49,51,.8)}
-.vb-krd .kc-group__more{flex:none;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,color .2s}
-.vb-krd .kc-group__more::after{content:"";width:7px;height:7px;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;transform:rotate(45deg)}
-.vb-krd .kc-group__more:hover{border-color:var(--kc-accent-2);color:var(--kc-accent)}
-.vb-krd .kc-mode-one .kc-group__more{display:none}
 .vb-krd .kc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
 .vb-krd .kc-card{display:flex;flex-direction:column;background:#fff;border-radius:24px;padding:12px 12px 16px;box-shadow:0 10px 30px rgba(32,64,67,.05);transition:box-shadow .25s,transform .25s}
 .vb-krd .kc-card:hover{box-shadow:0 18px 40px rgba(32,64,67,.12);transform:translateY(-2px)}
