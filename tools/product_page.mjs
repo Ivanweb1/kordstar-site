@@ -31,6 +31,10 @@ const preview = read('tilda/strop-1sk-preview.html')
 write('tilda/strop-1sk-preview.html', preview);
 write('strop-1sk.html', ghLinks(preview));
 
+// Страница «Стальные канаты» для GitHub Pages — из её превью (после python tools/tilda_block.py --doc steel-ropes)
+write('steel-ropes.html', ghLinks(read('tilda/steel-ropes-preview.html'))
+  .replace('<title>Превью вайб-блока</title>', '<title>Стальные канаты — превью Кордстар</title>'));
+
 // В превью каталога ссылки на отдельные страницы тоже ведут на GitHub Pages
 const catalog = 'tilda/catalog-preview.html';
 write(catalog, read(catalog)
