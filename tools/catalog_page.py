@@ -287,10 +287,12 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-empty.is-shown{display:block}
 .vb-krd .kc-empty p{margin:0 0 20px;font-size:16px;color:var(--kc-muted)}
 .vb-krd .kc-empty button{height:44px;padding:0 22px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font-size:14px;color:var(--kc-ink);cursor:pointer}
-.vb-krd .kc-cta{margin:80px 0 0;padding:56px 24px 88px;text-align:center}
-.vb-krd .kc-cta h2{margin:0 0 12px;font-family:"Montserrat",Arial,sans-serif;font-size:30px;line-height:1.15;font-weight:700;text-transform:uppercase;color:var(--kc-head)}
-.vb-krd .kc-cta p{max-width:520px;margin:0 auto 28px;font-size:16px;line-height:1.5;color:rgba(32,49,51,.8)}
-.vb-krd .kc-cta button{height:52px;padding:0 32px;border:0;border-radius:30px;background:var(--kc-accent);color:#fff;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s}
+.vb-krd .kc-cta{margin:72px 0 0;padding:0 0 88px}
+.vb-krd .kc-cta__box{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:192px;padding:36px 48px;border-radius:40px;background:#24393b url(img/Content2_1-32346136.webp) right center/cover no-repeat;color:#fff}
+.vb-krd .kc-cta h2{margin:0 0 12px;font-family:"Inter",Arial,sans-serif;font-size:20px;line-height:1.2;font-weight:600;color:#fff}
+.vb-krd .kc-cta p{max-width:560px;margin:0 0 24px;font-size:14px;line-height:1.5;color:#fff}
+.vb-krd .kc-cta button{display:inline-flex;align-items:center;gap:14px;height:48px;padding:0 24px 0 32px;border:0;border-radius:30px;background:#437d83;color:#f4f8f9;font-size:12px;font-weight:500;cursor:pointer;transition:background-color .2s}
+.vb-krd .kc-cta button svg{width:18px;height:18px}
 .vb-krd .kc-cta button:hover{background:#3a6a6f}
 .vb-krd .kc-info{list-style:none;margin:0 0 24px;padding:0;display:grid;gap:10px}
 .vb-krd .kc-info li{display:grid;gap:4px;padding:14px 16px;border-radius:14px;background:#f4f8f9;font-size:14px;line-height:1.45;color:#203133}
@@ -335,9 +337,10 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-card__text{font-size:12px}
 .vb-krd .kc-card__price{font-size:13px}
 .vb-krd .kc-card__btn{height:40px;font-size:13px}
-.vb-krd .kc-cta{margin-top:56px;padding:40px 0 64px}
-.vb-krd .kc-cta h2{font-size:22px}
-.vb-krd .kc-cta p{font-size:15px}
+.vb-krd .kc-cta{margin-top:48px;padding-bottom:56px}
+.vb-krd .kc-cta__box{min-height:0;padding:28px 20px 32px;border-radius:24px;background:linear-gradient(90deg,rgba(36,57,59,.94) 0%,rgba(36,57,59,.75) 65%,rgba(36,57,59,.2) 100%),#24393b url(img/Content2_1-32346136.webp) 78% center/cover no-repeat}
+.vb-krd .kc-cta h2{font-size:19px}
+.vb-krd .kc-cta p{margin-bottom:20px}
 }
 @media (max-width:339px){.vb-krd .kc-grid{grid-template-columns:1fr}}
 """
@@ -470,9 +473,13 @@ PAGE = (
     '<div class="kc-empty"><p>Ничего не нашлось. Попробуйте другой запрос или напишите нам — подберём.</p>'
     '<button type="button" data-kc-reset>Показать весь каталог</button></div>\n'
     '</div>\n</div>\n'
-    '<section class="kc-cta"><h2>Нужна помощь с подбором каната?</h2>'
+    # баннер как «Остались вопросы?» на главной: та же картинка-фон с крюком, белый текст, кнопка со стрелкой
+    '<section class="kc-cta"><div class="kc-cta__box"><h2>Нужна помощь с подбором каната?</h2>'
     '<p>Оставьте заявку, и мы свяжемся с вами в течение 2 часов</p>'
-    '<button type="button" data-krd-popup="pick">Получить консультацию</button></section>\n'
+    '<button type="button" data-krd-popup="pick">Получить консультацию'
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+    'stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line>'
+    '<polyline points="8 7 17 7 17 16"></polyline></svg></button></div></section>\n'
     '</main>\n</div>\n'
     '<style>\n%(css)s\n</style>\n'
     '<script>%(js)s</script>\n'
