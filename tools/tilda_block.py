@@ -81,6 +81,12 @@ if DOC:
     SECTION_ID = 'vb-krd-' + DOC
     OUT_NAME, PREVIEW_NAME, SECTION_NAME = DOC + '.html', DOC + '-preview.html', 'Документ Кордстар: ' + DOC
     fragment = read('tilda/_doc_%s.html' % DOC)
+    # свои поп-апы страницы (каталог) — между <!--krd-pops--> и <!--/krd-pops-->
+    own_pops = ''
+    mp = re.search(r'<!--krd-pops-->(.*?)<!--/krd-pops-->', fragment, re.S)
+    if mp:
+        own_pops = mp.group(1).strip()
+        fragment = fragment[:mp.start()] + fragment[mp.end():]
     head_from = src.index('<div id="rec3443015601"')      # шапка (десктоп), шапка (телефон), подменю
     head_to = src.index('<div id="rec3719020401"')        # первый экран главной — уже не шапка
     foot_from = src.index('<div id="rec3443017301"')      # подвал
@@ -89,8 +95,19 @@ if DOC:
     pops = src[pops_from:pops_to]
     cookie = pops[pops.index('<div class="krd-cookie"'):]
     cookie = cookie[:cookie.index('</div>') + len('</div>')]
+    # поп-апы главной, которые открывает страница (data-krd-popup="pick" → #krd-pop-pick), и плашка ошибок
+    main_pops = ''
+    if own_pops or 'data-krd-popup' in fragment:
+        for pid in sorted(set(re.findall(r'data-krd-popup="([\w-]+)"', fragment + own_pops))):
+            start = pops.find('<div class="krd-pop" id="krd-pop-%s"' % pid)
+            if start != -1:
+                end = min(i for i in (pops.find('\n<div class="krd-pop" ', start + 1), pops.find('\n<div class="krd-toast"', start))
+                          if i != -1)
+                main_pops += pops[start:end].strip() + '\n'
+        main_pops += '<div class="krd-toast" role="status" aria-live="polite"></div>\n'
     src = (src[:head_from] + src[head_from:head_to] + fragment + '\n' + src[foot_from:pops_from]
-           + '<div class="vb-krd krd-pops" id="krd-pops">\n' + cookie + '\n</div>\n' + src[pops_to:])
+           + '<div class="vb-krd krd-pops" id="krd-pops">\n' + main_pops + own_pops + '\n' + cookie + '\n</div>\n'
+           + src[pops_to:])
 doc = LH.fromstring(src)
 body = re.search(r'<!--allrecords-->\s*(<div id="allrecords".*?)<script src="js/main.js">', src, re.S).group(1)
 inner = re.sub(r'^<div id="allrecords"[^>]*>', '', body.strip())
@@ -272,6 +289,8 @@ css = FONTS + css
 # ---------- атрибуты: оставляем только нужные стилям и скрипту ----------
 need_attrs = set(re.findall(r'\[([\w-]+)', css)) | set(a for a in js_words if a.startswith('data-'))
 need_attrs |= {'data-elem-id', 'data-group-id', 'data-elem-type'}
+if DOC:  # атрибуты, которые читает скрипт самой страницы (data-kc-… в каталоге)
+    need_attrs |= set(re.findall(r'(data-[\w-]+)', fragment))
 
 
 def keep_attr(name):
