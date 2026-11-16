@@ -38,6 +38,9 @@ def read(p):
 
 # ---------- картинки: локальный файл -> CDN Тильды ----------
 def cdn_map():
+    ref_path = os.path.join(ROOT, 'reference', 'index.html')
+    if not os.path.exists(ref_path):
+        return {}  # в GitHub нет исходного MHTML; картинки возьмём из img/ на GitHub Pages
     ref = read('reference/index.html')
     m = {}
     for tid, rest in re.findall(r'tildacdn\.com/(til[da][0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f-]+)/([^"\'\s)&]+)', ref):
