@@ -2348,6 +2348,28 @@ document.addEventListener("DOMContentLoaded", function() {
   var DOCS = { policy: '/policy', consent: '/soglasie' };
   var KEY = 'krd-cookie-ok';
 
+  /* Адреса страниц сайта: на Тильде — /, /catalog, /policy, /soglasie.
+     В превью из репозитория (GitHub Pages, локальный сервер) таких страниц нет — там ведём
+     на index.html и tilda/*-preview.html этого же репозитория. */
+  var PREVIEW = { '/catalog': 'tilda/catalog-preview.html', '/policy': 'tilda/policy-preview.html',
+                  '/soglasie': 'tilda/soglasie-preview.html' };
+  var isRepoPreview = location.protocol === 'file:' ||
+    /^(localhost|127\.0\.0\.1)$|\.github\.io$/.test(location.hostname);
+  // корень репозитория: /kordstar-site/ на GitHub Pages, / локально (превью лежат в tilda/)
+  var repoBase = location.pathname.replace(/tilda\/[^\/]*$/, '').replace(/[^\/]*$/, '');
+  function siteUrl(url) {
+    if (!isRepoPreview || !url || url.charAt(0) !== '/' || url.charAt(1) === '/') return url;
+    var m = url.match(/^([^#?]*)(.*)$/);
+    var path = m[1].replace(/\/+$/, '') || '/';
+    if (path === '/') return repoBase + (location.protocol === 'file:' ? 'index.html' : '') + m[2];
+    return PREVIEW[path] ? repoBase + PREVIEW[path] + m[2] : url;
+  }
+  window.KRD_SITE_URL = siteUrl;
+  Object.keys(DOCS).forEach(function (k) { DOCS[k] = siteUrl(DOCS[k]); });
+  document.querySelectorAll('a[href^="/"]').forEach(function (a) {
+    a.setAttribute('href', siteUrl(a.getAttribute('href')));
+  });
+
   document.querySelectorAll('[data-krd-link]').forEach(function (el) {
     var url = DOCS[el.getAttribute('data-krd-link')];
     if (!url) return;

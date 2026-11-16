@@ -109,7 +109,7 @@ if DOC:
            + '<div class="vb-krd krd-pops" id="krd-pops">\n' + main_pops + own_pops + '\n' + cookie + '\n</div>\n'
            + src[pops_to:])
 doc = LH.fromstring(src)
-body = re.search(r'<!--allrecords-->\s*(<div id="allrecords".*?)<script src="js/main.js">', src, re.S).group(1)
+body = re.search(r'<!--allrecords-->\s*(<div id="allrecords".*?)<script src="js/main.js[^"]*">', src, re.S).group(1)
 inner = re.sub(r'^<div id="allrecords"[^>]*>', '', body.strip())
 inner = re.sub(r'</div>\s*(?:<!--/allrecords-->)?\s*$', '', inner.strip())
 

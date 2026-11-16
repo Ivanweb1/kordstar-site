@@ -417,7 +417,7 @@ JS = r"""
     if (e.target.closest('[data-kc-reset]')) { search.value = ''; show('all', true); return; }
     if (e.target.closest('[data-kc-back]')) {
       if (document.referrer && document.referrer.indexOf(location.host) !== -1) history.back();
-      else location.href = '/';
+      else location.href = window.KRD_SITE_URL ? window.KRD_SITE_URL('/') : '/';
     }
   });
   // «Предзаказ» / «Оставить запрос»: подставляем товар в поп-ап (свой обработчик срабатывает раньше,
