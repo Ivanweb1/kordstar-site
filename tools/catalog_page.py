@@ -101,15 +101,18 @@ def count(c):
 
 def card(cat, title, text, button, popup, rank):
     cid, cname, icon = cat[0], cat[1], cat[2]
+    detail = ('<a class="kc-card__detail" href="/strop-1sk">Строп 1СК →</a>'
+              if title == 'Канатные ветвевые стропы' else '')
     return (
         '<article class="kc-card%s" data-kc-cat="%s" data-kc-name="%s" data-kc-rank="%d">'
         '<div class="kc-card__ph"><img src="%s" alt="" width="72" height="72" loading="lazy"></div>'
         '<h3 class="kc-card__title">%s</h3>'
         '<p class="kc-card__text">%s</p>'
+        '%s'
         '<p class="kc-card__price">%s</p>'
         '<button class="kc-card__btn" type="button" data-krd-popup="%s" data-kc-product="%s">%s</button>'
         '</article>'
-    ) % ('' if popup == 'order' else ' kc-card--wide', cid, E(title.lower()), rank, icon, E(title), E(text),
+    ) % ('' if popup == 'order' else ' kc-card--wide', cid, E(title.lower()), rank, icon, E(title), E(text), detail,
          PRICE if popup == 'order' else 'Ответ за 30 минут', popup, E(title if popup == 'order' else cname), button)
 
 
@@ -282,6 +285,7 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-card--wide .kc-card__btn{grid-column:3;grid-row:1/4;align-self:center;padding:0 32px;background:var(--kc-accent);border-color:var(--kc-accent);color:#fff}
 .vb-krd .kc-card--wide .kc-card__btn:hover{background:#3a6a6f;border-color:#3a6a6f}
 .vb-krd .kc-card__title{margin:0 4px 6px;font-family:"Inter",Arial,sans-serif;font-size:14px;line-height:1.35;font-weight:600;color:var(--kc-ink)}
+.vb-krd .kc-card__detail{margin:0 4px 8px;color:#204043;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .vb-krd .kc-card__text{margin:0 4px 10px;font-size:12px;line-height:1.4;color:rgba(32,49,51,.8)}
 .vb-krd .kc-card__price{margin:auto 4px 10px;font-size:13px;font-weight:600;color:var(--kc-head)}
 .vb-krd .kc-card__btn{height:38px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:13px;font-weight:500;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
