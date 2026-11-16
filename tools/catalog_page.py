@@ -125,9 +125,12 @@ def groups():
         out.append(
             '<section class="kc-group" data-kc-group="%s">'
             '<div class="kc-group__head"><div><h2 class="kc-group__title">%s <span class="kc-group__count">%d</span></h2>'
-            '<p class="kc-group__lead">%s</p></div>'
-            '<button class="kc-group__more" type="button" data-kc-show="%s">Весь раздел</button></div>'
-            '<div class="kc-grid">%s</div></section>' % (cid, E(cname), count(c), E(lead), cid, cards))
+            '<p class="kc-group__lead">%s</p></div>%s</div>'
+            '<div class="kc-grid">%s</div></section>' % (
+                cid, E(cname), count(c), E(lead),
+                # «Только этот раздел» — где карточек больше одного ряда; у одной карточки кнопка лишняя
+                '<button class="kc-group__more" type="button" data-kc-show="%s">Только этот раздел</button>' % cid
+                if count(c) > 4 else '', cards))
     return '\n'.join(out)
 
 
@@ -140,8 +143,10 @@ def chips():
 
 
 def side():
-    out = ['<li><button type="button" class="is-active" data-kc-show="all">Все</button></li>']
-    out += ['<li><button type="button" data-kc-show="%s">%s</button></li>' % (c[0], E(c[1])) for c in CATS]
+    total = sum(count(c) for c in CATS)
+    out = ['<li><button type="button" class="is-active" data-kc-show="all">Все товары<span>%d</span></button></li>' % total]
+    out += ['<li><button type="button" data-kc-show="%s">%s<span>%d</span></button></li>' % (c[0], E(c[1]), count(c))
+            for c in CATS]
     return ''.join(out)
 
 
@@ -227,20 +232,21 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-crumbs a:hover,.vb-krd .kc-crumbs button:hover{color:var(--kc-accent)}
 .vb-krd .kc-crumbs i{font-style:normal;color:#a9babc}
 .vb-krd .kc-crumbs span{color:var(--kc-ink)}
-.vb-krd .kc-top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:0 0 24px}
+.vb-krd .kc-top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:0 0 32px}
+.vb-krd .kc-sub{margin:12px 0 0;font-size:15px;line-height:1.4;color:rgba(32,49,51,.75)}
 .vb-krd .kc-title{margin:0;font-family:"Montserrat",Arial,sans-serif;font-size:34px;line-height:1;font-weight:700;text-transform:uppercase;color:var(--kc-head)}
 .vb-krd .kc-help{display:flex;gap:8px;flex-wrap:wrap}
 .vb-krd .kc-help button{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s,color .2s}
 .vb-krd .kc-help button::before{content:"?";display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--kc-soft);color:var(--kc-accent);font-size:12px;font-weight:700}
 .vb-krd .kc-help button:hover{border-color:var(--kc-accent-2);color:var(--kc-accent)}
-.vb-krd .kc-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.vb-krd .kc-chips{display:none;gap:8px;margin:0 0 16px}
 .vb-krd .kc-chip{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
 .vb-krd .kc-chip span{font-size:12px;color:var(--kc-muted)}
 .vb-krd .kc-chip:hover{border-color:var(--kc-accent-2)}
 .vb-krd .kc-chip.is-active{background:var(--kc-accent);border-color:var(--kc-accent);color:#fff}
 .vb-krd .kc-chip.is-active span{color:rgba(255,255,255,.75)}
-.vb-krd .kc-tools{display:flex;justify-content:flex-end;gap:12px;margin:0 0 24px}
-.vb-krd .kc-search{position:relative;width:280px}
+.vb-krd .kc-tools{display:flex;gap:12px;margin:0 0 32px}
+.vb-krd .kc-search{position:relative;flex:1;min-width:0}
 .vb-krd .kc-search input{width:100%;height:44px;padding:0 44px 0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font:inherit;font-size:14px;color:var(--kc-ink);outline:none;transition:border-color .2s}
 .vb-krd .kc-search input:focus{border-color:var(--kc-accent-2)}
 .vb-krd .kc-search svg{position:absolute;right:16px;top:12px;width:20px;height:20px;pointer-events:none}
@@ -248,12 +254,15 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-sort select{height:44px;padding:0 44px 0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font:inherit;font-size:14px;color:var(--kc-ink);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none}
 .vb-krd .kc-sort select:focus{border-color:var(--kc-accent-2)}
 .vb-krd .kc-sort::after{content:"";position:absolute;right:20px;top:17px;width:7px;height:7px;border-right:2px solid var(--kc-accent);border-bottom:2px solid var(--kc-accent);transform:rotate(45deg);pointer-events:none}
-.vb-krd .kc-layout{display:grid;grid-template-columns:260px 1fr;gap:32px;align-items:start}
+.vb-krd .kc-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:start}
+.vb-krd .kc-list{min-width:0}
 .vb-krd .kc-side{position:sticky;top:110px;background:#fff;border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(32,64,67,.05)}
 .vb-krd .kc-side__title{margin:0 0 14px;font-family:"Montserrat",Arial,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--kc-head)}
 .vb-krd .kc-side ul{list-style:none;margin:0;padding:0}
 .vb-krd .kc-side li+li{margin-top:2px}
-.vb-krd .kc-side li button{display:block;width:100%;padding:9px 12px;border:0;border-radius:12px;background:none;text-align:left;font-size:14px;line-height:1.35;color:var(--kc-ink);cursor:pointer;transition:background-color .2s,color .2s}
+.vb-krd .kc-side li button span{flex:none;font-size:12px;color:var(--kc-muted)}
+.vb-krd .kc-side li button.is-active span{color:var(--kc-accent-2)}
+.vb-krd .kc-side li button{display:flex;justify-content:space-between;align-items:baseline;gap:12px;width:100%;padding:9px 12px;border:0;border-radius:12px;background:none;text-align:left;font-size:14px;line-height:1.35;color:var(--kc-ink);cursor:pointer;transition:background-color .2s,color .2s}
 .vb-krd .kc-side li button:hover{background:var(--kc-soft)}
 .vb-krd .kc-side li button.is-active{background:var(--kc-soft);color:var(--kc-accent);font-weight:600}
 .vb-krd .kc-group+.kc-group{margin-top:48px}
@@ -303,14 +312,13 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 @media (max-width:1199px){.vb-krd .kc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:959px){
 .vb-krd .kc-wrap{padding:100px 20px 0}
-.vb-krd .kc-layout{grid-template-columns:1fr}
+.vb-krd .kc-layout{grid-template-columns:minmax(0,1fr)}
 .vb-krd .kc-side{display:none}
 .vb-krd .kc-top{flex-direction:column;align-items:flex-start;gap:16px}
-.vb-krd .kc-chips{flex-wrap:nowrap;overflow-x:auto;margin:0 -20px 16px;padding:0 20px 4px;scrollbar-width:none}
+.vb-krd .kc-chips{display:flex;flex-wrap:nowrap;overflow-x:auto;margin:0 -20px 16px;padding:0 20px 4px;scrollbar-width:none}
 .vb-krd .kc-chips::-webkit-scrollbar{display:none}
 .vb-krd .kc-chip{flex:none}
-.vb-krd .kc-tools{justify-content:stretch}
-.vb-krd .kc-search{flex:1;width:auto}
+.vb-krd .kc-tools{margin-bottom:28px}
 }
 @media (max-width:639px){
 .vb-krd .kc-wrap{padding:88px 16px 0}
@@ -450,18 +458,20 @@ PAGE = (
     '<main class="kc-wrap">\n'
     '<nav class="kc-crumbs" aria-label="Навигация"><button type="button" data-kc-back>Назад</button><i>|</i>'
     '<a href="/">Главная</a><i>/</i><span>Каталог</span></nav>\n'
-    '<div class="kc-top"><h1 class="kc-title">Каталог</h1>'
+    '<div class="kc-top"><div><h1 class="kc-title">Каталог</h1>'
+    '<p class="kc-sub">Канаты, стропы, такелаж и комплектующие&nbsp;— %(total)d позиций в %(ncat)d разделах</p></div>'
     '<div class="kc-help"><button type="button" data-krd-popup="howto">Как выбрать?</button>'
     '<button type="button" data-krd-popup="where">Где применяется?</button></div></div>\n'
-    '<div class="kc-chips" role="group" aria-label="Категории">%(chips)s</div>\n'
-    '<div class="kc-tools"><label class="kc-search"><input type="search" placeholder="Поиск" aria-label="Поиск по каталогу" data-kc-search>'
-    '%(icon)s</label>'
-    '<label class="kc-sort"><select aria-label="Сортировка" data-kc-sort>'
-    '<option value="pop">Сортировать по: популярности</option><option value="name">Сортировать по: названию</option>'
-    '</select></label></div>\n'
     '<div class="kc-layout">\n'
-    '<aside class="kc-side"><p class="kc-side__title">Каталог</p><ul>%(side)s</ul></aside>\n'
-    '<div class="kc-list">\n%(groups)s\n'
+    '<aside class="kc-side"><p class="kc-side__title">Разделы</p><ul>%(side)s</ul></aside>\n'
+    '<div class="kc-list">\n'
+    '<div class="kc-chips" role="group" aria-label="Разделы">%(chips)s</div>\n'
+    '<div class="kc-tools"><label class="kc-search"><input type="search" placeholder="Поиск по каталогу" '
+    'aria-label="Поиск по каталогу" data-kc-search>%(icon)s</label>'
+    '<label class="kc-sort"><select aria-label="Сортировка" data-kc-sort>'
+    '<option value="pop">Сначала популярные</option><option value="name">По названию, А–Я</option>'
+    '</select></label></div>\n'
+    '%(groups)s\n'
     '<div class="kc-empty"><p>Ничего не нашлось. Попробуйте другой запрос или напишите нам — подберём.</p>'
     '<button type="button" data-kc-reset>Показать весь каталог</button></div>\n'
     '</div>\n</div>\n'
@@ -472,7 +482,7 @@ PAGE = (
     '<style>\n%(css)s\n</style>\n'
     '<script>%(js)s</script>\n'
     '<!--krd-pops-->\n%(pops)s\n<!--/krd-pops-->\n'
-) % dict(chips=chips(), icon=SEARCH_ICON, side=side(), groups=groups(), css=CSS.strip(), js=JS, pops=POPS)
+) % dict(total=sum(count(c) for c in CATS), ncat=len(CATS), chips=chips(), icon=SEARCH_ICON, side=side(), groups=groups(), css=CSS.strip(), js=JS, pops=POPS)
 
 assert '<' not in JS, 'в скрипте не должно быть «<»'
 
