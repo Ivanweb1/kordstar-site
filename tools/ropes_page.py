@@ -221,8 +221,13 @@ def build(cards):
         '<svg viewBox="0 0 24 24" fill="none" stroke="#69979c" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
         '<circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg></label>'
         '<button type="button" class="kr-open" data-kr-open>Фильтры <span data-kr-active></span></button>'
-        '<label class="kc-sort kr-sort"><span>Сортировать по:</span><select aria-label="Сортировать по" data-kc-sort><option value="pop">популярности</option>'
-        '<option value="d">диаметру</option><option value="name">названию</option></select></label></div>\n'
+        '<div class="kr-sort" data-kr-sort><button type="button" class="kr-sort__btn" aria-haspopup="listbox" aria-expanded="false" data-kr-sort-btn>'
+        '<span class="kr-sort__pre">Сортировать по:</span> <b data-kr-sort-val>популярности</b>%s</button>'
+        '<ul class="kr-sort__list" role="listbox" aria-label="Сортировать по" tabindex="-1" hidden>'
+        '<li role="option" data-v="pop" aria-selected="true">популярности</li><li role="option" data-v="d" aria-selected="false">диаметру</li>'
+        '<li role="option" data-v="name" aria-selected="false">названию</li></ul>'
+        '<select hidden aria-hidden="true" tabindex="-1" data-kc-sort><option value="pop">популярности</option>'
+        '<option value="d">диаметру</option><option value="name">названию</option></select></div></div>\n'
         '<div class="kr-bar"><p class="kr-found">Найдено: <b data-kr-total></b></p><div class="kr-picked" data-kr-picked></div></div>\n'
         '<div class="kr-grid">%s</div>\n'
         '<div class="kc-empty"><p>Под эти параметры марок нет. Измените фильтры или оставьте заявку — подберём канат.</p>'
@@ -232,9 +237,11 @@ def build(cards):
         '<details class="kr-acc" id="kr-howto" open><summary><h2>Как выбрать?</h2>%s</summary><dl class="kr-acc__rows">%s</dl></details>'
         '<details class="kr-acc" id="kr-where" open><summary><h2>Где применяется?</h2>%s</summary><ul class="kr-acc__list">%s</ul></details>'
         '</section>\n'
-        '<!--/ropes-->\n') % (side, ''.join(out), ARROW, howto, ARROW, where)
-    sub = ('Для подъёмной, строительной и буровой техники. %d марок, диаметр от %s до %s мм, другие — по запросу.'
-           % (len(cards), diams[0], diams[-1]))
+        '<!--/ropes-->\n') % (side, ARROW, ''.join(out), ARROW, howto, ARROW, where)
+    n = len(cards)
+    word = 'марок' if 11 <= n % 100 <= 14 else {1: 'марка', 2: 'марки', 3: 'марки', 4: 'марки'}.get(n % 10, 'марок')
+    sub = ('Для подъёмной, строительной и буровой техники.<br>%d %s, диаметр от %s до %s мм, другие — по запросу.'
+           % (n, word, diams[0], diams[-1]))
     return layout, sub
 
 
@@ -298,9 +305,21 @@ CSS = r'''
 .vb-krd .kr-card__price{margin:auto 4px 10px;font-size:14px;font-weight:600;color:var(--kc-head)}
 .vb-krd .kr-card__btn{height:40px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:13px;font-weight:500;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
 .vb-krd .kr-card__btn:hover{background:var(--kc-accent);border-color:var(--kc-accent);color:#fff}
-.vb-krd .kr-sort{display:flex;align-items:center;height:44px;padding:0 0 0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font-size:14px;color:var(--kc-muted);cursor:pointer}
-.vb-krd .kr-sort span{flex:none;margin-right:4px}
-.vb-krd .kr-sort select{height:42px;padding:0 44px 0 0;border:0;background:none;color:var(--kc-ink)}
+.vb-krd .vb-krd-cat .kc-top{align-items:center;gap:40px}
+.vb-krd .vb-krd-cat .kc-sub{max-width:620px}
+.vb-krd .vb-krd-cat .kc-help{flex:none;flex-wrap:nowrap}
+.vb-krd .kr-sort{position:relative;flex:none}
+.vb-krd .kr-sort__btn{display:flex;align-items:center;gap:4px;height:44px;padding:0 16px 0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font:inherit;font-size:14px;color:var(--kc-muted);white-space:nowrap;cursor:pointer;transition:border-color .2s}
+.vb-krd .kr-sort__btn:hover,.vb-krd .kr-sort__btn[aria-expanded="true"]{border-color:var(--kc-accent-2)}
+.vb-krd .kr-sort__btn b{font-weight:500;color:var(--kc-ink)}
+.vb-krd .kr-sort__btn svg{width:18px;height:18px;margin-left:6px;color:var(--kc-accent);transform:rotate(180deg);transition:transform .2s}
+.vb-krd .kr-sort__btn[aria-expanded="true"] svg{transform:none}
+.vb-krd .kr-sort__list{position:absolute;z-index:20;top:calc(100% + 6px);right:0;min-width:100%;margin:0;padding:6px;list-style:none;border-radius:16px;background:#fff;box-shadow:0 18px 40px rgba(32,64,67,.16);outline:none}
+.vb-krd .kr-sort__list[hidden]{display:none}
+.vb-krd .kr-sort__list li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border-radius:10px;font-size:14px;color:var(--kc-ink);cursor:pointer;transition:background-color .15s,color .15s}
+.vb-krd .kr-sort__list li:hover,.vb-krd .kr-sort__list li.is-focus{background:var(--kc-soft)}
+.vb-krd .kr-sort__list li[aria-selected="true"]{color:var(--kc-accent);font-weight:600}
+.vb-krd .kr-sort__list li[aria-selected="true"]::after{content:"";width:12px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(-45deg)}
 .vb-krd .kr-help{display:grid;gap:12px;margin:72px 0 0}
 .vb-krd .kr-acc{padding:0 32px;border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(32,64,67,.05)}
 .vb-krd .kr-acc summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0;list-style:none;cursor:pointer}
@@ -353,9 +372,9 @@ CSS = r'''
 .vb-krd .kr-grid{grid-template-columns:1fr}
 .vb-krd .kc-tools{display:grid;grid-template-columns:1fr auto}
 .vb-krd .kc-tools .kc-search{grid-column:1/-1}
-.vb-krd .kr-sort{padding-left:16px}
-.vb-krd .kr-sort span{display:none}
-.vb-krd .kr-sort select{padding-right:36px}
+.vb-krd .vb-krd-cat .kc-sub br{display:none}
+.vb-krd .kr-sort__btn{width:100%;justify-content:space-between;padding:0 14px 0 18px}
+.vb-krd .kr-sort__pre{display:none}
 .vb-krd .kr-card{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:14px;align-content:start;padding:10px 10px 12px}
 .vb-krd .kr-card__ph{grid-row:1/5;width:96px;height:96px;aspect-ratio:auto;margin:0}
 .vb-krd .kr-card__ph img{width:52px;height:52px;border-radius:14px}
@@ -606,8 +625,45 @@ JS = r'''
   [from, to].forEach(function (el) {
     el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
   });
+  // сортировка: свой список в стиле сайта, значение хранится в скрытом select
+  var sbox = root.querySelector('[data-kr-sort]');
+  var sbtn = sbox.querySelector('[data-kr-sort-btn]');
+  var slist = sbox.querySelector('[role="listbox"]');
+  var sopts = [].slice.call(slist.querySelectorAll('[role="option"]'));
+  var sfocus = 0;
+  function sortOpen(on) {
+    slist.hidden = !on;
+    sbtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) {
+      sfocus = Math.max(0, sopts.map(function (o) { return o.getAttribute('aria-selected'); }).indexOf('true'));
+      sortFocus();
+      slist.focus({ preventScroll: true });
+    }
+  }
+  function sortFocus() { sopts.forEach(function (o, i) { o.classList.toggle('is-focus', i === sfocus); }); }
+  function sortPick(o) {
+    sopts.forEach(function (x) { x.setAttribute('aria-selected', x === o ? 'true' : 'false'); });
+    sbox.querySelector('[data-kr-sort-val]').textContent = o.textContent;
+    sort.value = o.getAttribute('data-v');
+    order();
+    sortOpen(false);
+    sbtn.focus({ preventScroll: true });
+  }
+  sbtn.addEventListener('click', function () { sortOpen(slist.hidden); });
+  slist.addEventListener('click', function (e) { var o = e.target.closest('[role="option"]'); if (o) sortPick(o); });
+  slist.addEventListener('mousemove', function (e) {
+    var o = e.target.closest('[role="option"]');
+    if (o) { sfocus = sopts.indexOf(o); sortFocus(); }
+  });
+  slist.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); sfocus = Math.min(sopts.length - 1, sfocus + 1); sortFocus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); sfocus = Math.max(0, sfocus - 1); sortFocus(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sortPick(sopts[sfocus]); }
+    else if (e.key === 'Escape' || e.key === 'Tab') { sortOpen(false); if (e.key === 'Escape') sbtn.focus({ preventScroll: true }); }
+  });
+  document.addEventListener('click', function (e) { if (!slist.hidden && !sbox.contains(e.target)) sortOpen(false); });
+
   search.addEventListener('input', apply);
-  sort.addEventListener('change', order);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('is-open')) openSide(false); });
   paintRange();
   apply();
@@ -624,7 +680,7 @@ def main():
     else:
         a = s.index('<div class="kc-layout">'); b = s.index('<section class="kc-cta">')
     s = s[:a] + layout + s[b:]
-    s = re.sub(r'(<p class="kc-sub">)[^<]*(</p>)', lambda m: m.group(1) + sub + m.group(2), s, count=1)
+    s = re.sub(r'(<p class="kc-sub">).*?(</p>)', lambda m: m.group(1) + sub + m.group(2), s, count=1)
     # «Как выбрать?» и «Где применяется?» ведут к блокам под каталогом, как в прототипе
     s = s.replace('<button type="button" data-krd-popup="howto">', '<button type="button" data-kr-jump="kr-howto">')
     s = s.replace('<button type="button" data-krd-popup="where">', '<button type="button" data-kr-jump="kr-where">')
