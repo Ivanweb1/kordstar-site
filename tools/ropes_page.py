@@ -129,6 +129,12 @@ ARROW = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
          'stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>')
 
 
+FILTER_ICON = ('<svg class="kr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+               'aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>')
+SORT_ICON = ('<svg class="kr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+             'stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg>')
+
+
 def present(order, values):
     return [o for o in order if o in values] + sorted(v for v in values if v not in order)
 
@@ -220,9 +226,9 @@ def build(cards):
         # лупа как в общем каталоге (стили .kc-search svg уже есть на странице)
         '<svg viewBox="0 0 24 24" fill="none" stroke="#69979c" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
         '<circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg></label>'
-        '<button type="button" class="kr-open" data-kr-open>Фильтры <span data-kr-active></span></button>'
+        '<button type="button" class="kr-open" data-kr-open>' + FILTER_ICON + 'Фильтры <span data-kr-active></span></button>'
         '<div class="kr-sort" data-kr-sort><button type="button" class="kr-sort__btn" aria-haspopup="listbox" aria-expanded="false" data-kr-sort-btn>'
-        '<span class="kr-sort__pre">Сортировать по:</span> <b data-kr-sort-val>популярности</b>%s</button>'
+        '' + SORT_ICON + '<span class="kr-sort__pre">Сортировать по:</span> <b data-kr-sort-val>популярности</b>%s</button>'
         '<ul class="kr-sort__list" role="listbox" aria-label="Сортировать по" tabindex="-1" hidden>'
         '<li role="option" data-v="pop" aria-selected="true">популярности</li><li role="option" data-v="d" aria-selected="false">диаметру</li>'
         '<li role="option" data-v="name" aria-selected="false">названию</li></ul>'
@@ -240,7 +246,7 @@ def build(cards):
         '<!--/ropes-->\n') % (side, ARROW, ''.join(out), ARROW, howto, ARROW, where)
     n = len(cards)
     word = 'марок' if 11 <= n % 100 <= 14 else {1: 'марка', 2: 'марки', 3: 'марки', 4: 'марки'}.get(n % 10, 'марок')
-    sub = ('Для подъёмной, строительной и буровой техники.<br>%d %s, диаметр от %s до %s мм, другие — по запросу.'
+    sub = ('Для подъёмной, строительной и буровой техники. <br>%d %s, диаметр от %s до %s мм, другие — по запросу.'
            % (n, word, diams[0], diams[-1]))
     return layout, sub
 
@@ -305,9 +311,9 @@ CSS = r'''
 .vb-krd .kr-card__price{margin:auto 4px 10px;font-size:14px;font-weight:600;color:var(--kc-head)}
 .vb-krd .kr-card__btn{height:40px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:13px;font-weight:500;cursor:pointer;transition:background-color .2s,border-color .2s,color .2s}
 .vb-krd .kr-card__btn:hover{background:var(--kc-accent);border-color:var(--kc-accent);color:#fff}
-.vb-krd .vb-krd-cat .kc-top{align-items:center;gap:40px}
-.vb-krd .vb-krd-cat .kc-sub{max-width:620px}
-.vb-krd .vb-krd-cat .kc-help{flex:none;flex-wrap:nowrap}
+@media(min-width:960px){.vb-krd .vb-krd-cat .kc-top{align-items:center;gap:40px}.vb-krd .vb-krd-cat .kc-sub{max-width:620px}.vb-krd .vb-krd-cat .kc-help{flex:none;flex-wrap:nowrap}}
+.vb-krd .kr-ico{flex:none;width:18px;height:18px;color:var(--kc-accent)}
+.vb-krd .kr-sort__btn .kr-ico{display:none;margin:0}
 .vb-krd .kr-sort{position:relative;flex:none}
 .vb-krd .kr-sort__btn{display:flex;align-items:center;gap:4px;height:44px;padding:0 16px 0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;font:inherit;font-size:14px;color:var(--kc-muted);white-space:nowrap;cursor:pointer;transition:border-color .2s}
 .vb-krd .kr-sort__btn:hover,.vb-krd .kr-sort__btn[aria-expanded="true"]{border-color:var(--kc-accent-2)}
@@ -352,6 +358,9 @@ CSS = r'''
 #krd-pops .kr-specs dt{color:#5f7375}
 #krd-pops .kr-specs dd{margin:0;color:#203133;font-weight:500}
 @media(max-width:959px){
+.vb-krd .vb-krd-cat .kc-top{align-items:stretch;gap:16px;margin-bottom:24px}
+.vb-krd .vb-krd-cat .kc-help{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vb-krd .vb-krd-cat .kc-help button{justify-content:center;padding:0 10px}
 .vb-krd .vb-krd-cat .kr-layout{display:block}
 .vb-krd .kr-open{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border:1px solid var(--kc-line);border-radius:30px;background:#fff;color:var(--kc-ink);font-size:14px;font-weight:500;cursor:pointer}
 .vb-krd .kr-open span:not(:empty){display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:20px;background:var(--kc-accent);color:#fff;font-size:11px}
@@ -369,20 +378,28 @@ CSS = r'''
 .vb-krd .kr-acc__rows div{grid-template-columns:160px 1fr}
 }
 @media(max-width:639px){
-.vb-krd .kr-grid{grid-template-columns:1fr}
-.vb-krd .kc-tools{display:grid;grid-template-columns:1fr auto}
+.vb-krd .kr-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.vb-krd .kc-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.vb-krd .kr-sort{min-width:0}
 .vb-krd .kc-tools .kc-search{grid-column:1/-1}
+.vb-krd .kr-open,.vb-krd .kr-sort__btn{width:100%;height:44px;justify-content:flex-start;gap:10px;padding:0 16px;font-size:14px;font-weight:500;color:var(--kc-ink)}
+.vb-krd .kr-open span:not(:empty){margin-left:auto}
+.vb-krd .kr-sort__btn .kr-ico{display:block}
+.vb-krd .kr-sort__btn b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.vb-krd .kr-sort__btn svg:last-child{display:none}
+.vb-krd .kr-open,.vb-krd .kr-sort__btn{gap:8px;padding:0 14px}
 .vb-krd .vb-krd-cat .kc-sub br{display:none}
-.vb-krd .kr-sort__btn{width:100%;justify-content:space-between;padding:0 14px 0 18px}
 .vb-krd .kr-sort__pre{display:none}
-.vb-krd .kr-card{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:14px;align-content:start;padding:10px 10px 12px}
-.vb-krd .kr-card__ph{grid-row:1/5;width:96px;height:96px;aspect-ratio:auto;margin:0}
-.vb-krd .kr-card__ph img{width:52px;height:52px;border-radius:14px}
-.vb-krd .kr-card__badge{top:auto;bottom:6px;left:6px;right:6px;padding:3px 6px;font-size:10px;text-align:center}
-.vb-krd .kr-card__title{margin-top:2px;font-size:15px}
-.vb-krd .kr-card__text{margin-bottom:8px;font-size:12px}
-.vb-krd .kr-card__price{margin:0 4px}
-.vb-krd .kr-card__btn{grid-column:1/-1;height:44px;margin-top:12px}
+.vb-krd .kr-sort__list{left:0;right:0}
+.vb-krd .kr-card{padding:6px 6px 10px;border-radius:16px}
+.vb-krd .kr-card__ph{margin-bottom:10px;border-radius:12px}
+.vb-krd .kr-card__ph img{width:48px;height:48px;border-radius:12px}
+.vb-krd .kr-card__badge{top:6px;left:6px;padding:3px 8px;font-size:10px}
+.vb-krd .kr-card__title{margin:0 4px 2px;font-size:14px}
+.vb-krd .kr-card__code{margin:0 4px 6px;font-size:11px;overflow-wrap:anywhere}
+.vb-krd .kr-card__text{margin:0 4px 10px;font-size:12px}
+.vb-krd .kr-card__price{margin:auto 4px 8px;font-size:13px}
+.vb-krd .kr-card__btn{height:38px;font-size:13px}
 .vb-krd .kr-help{margin-top:48px}
 .vb-krd .kr-acc{padding:0 18px;border-radius:20px}
 .vb-krd .kr-acc summary{padding:20px 0}
