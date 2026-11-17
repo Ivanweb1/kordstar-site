@@ -213,7 +213,10 @@ def build(cards):
         '<aside class="kr-side" data-kr-side aria-label="Фильтры"><button type="button" class="kr-close" data-kr-close aria-label="Закрыть фильтры"></button>%s</aside>\n'
         '<div class="kc-list">\n'
         '<div class="kc-tools"><label class="kc-search"><input type="search" placeholder="Поиск" '
-        'aria-label="Поиск по стальным канатам" data-kc-search></label>'
+        'aria-label="Поиск по стальным канатам" data-kc-search>'
+        # лупа как в общем каталоге (стили .kc-search svg уже есть на странице)
+        '<svg viewBox="0 0 24 24" fill="none" stroke="#69979c" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
+        '<circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg></label>'
         '<button type="button" class="kr-open" data-kr-open>Фильтры <span data-kr-active></span></button>'
         '<label class="kc-sort kr-sort"><span>Сортировать по:</span><select aria-label="Сортировать по" data-kc-sort><option value="pop">популярности</option>'
         '<option value="d">диаметру</option><option value="name">названию</option></select></label></div>\n'
