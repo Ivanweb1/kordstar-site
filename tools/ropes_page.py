@@ -18,6 +18,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(ROOT, 'data', 'steel-ropes.xlsx')
 DOC = os.path.join(ROOT, 'tilda', '_doc_steel-ropes.html')
 ICON = 'img/Frame_2136139848-32303965.webp'
+# куда ведёт клик по карточке. Пока у марок нет своих страниц — на готовую карточку 1СК как образец;
+# потом здесь будет страница-шаблон марки (/steel-rope?m=<код>)
+PRODUCT_URL = '/strop-1sk'
 FIXES = []  # что поправили в данных — печатаем в конце
 
 # порядок и подписи фильтров — из прототипа
@@ -185,8 +188,8 @@ def build(cards):
         badge = '<span class="kr-card__badge">Некрутящийся</span>' if c['nonrot'] == 'Да' else ''
         out.append(
             '<article class="kr-card" data-kr-i="%d" data-kr-c="%s" data-kr-k="%s" data-kr-l="%s" data-kr-rows="%s" data-kr-min="%s" data-kr-s="%s">'
-            '<button type="button" class="kr-card__ph" data-krd-popup="rope" aria-label="Подробнее: канат %s">%s<img src="%s" alt="" width="72" height="72" loading="lazy"></button>'
-            '<h3 class="kr-card__title"><button type="button" data-krd-popup="rope">Канат %s</button></h3>'
+            '<a class="kr-card__ph" href="%s" aria-label="Подробнее: канат %s">%s<img src="%s" alt="" width="72" height="72" loading="lazy"></a>'
+            '<h3 class="kr-card__title"><a href="%s">Канат %s</a></h3>'
             '<p class="kr-card__code">%s</p>'
             '<p class="kr-card__text">%s</p>'
             '<p class="kr-card__price">Цена по запросу</p>'
@@ -196,7 +199,7 @@ def build(cards):
             '<dl class="kr-specs">%s</dl></div>'
             '</article>' % (
                 i, esc(c['fconstr']), esc(c['fcoat']), esc(c['flay']), esc(json.dumps(rows, ensure_ascii=False, separators=(',', ':'))),
-                c['rows'][0]['num'], esc(search), esc(c['code']), badge, ICON, esc(c['constr']), esc(c['code']), esc(text),
+                c['rows'][0]['num'], esc(search), PRODUCT_URL, esc(c['code']), badge, ICON, PRODUCT_URL, esc(c['constr']), esc(c['code']), esc(text),
                 esc('Канат ' + c['code']), esc(c['desc']), chips, adv, dl))
 
     howto = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (esc(a), esc(b)) for a, b in HOWTO)
@@ -228,8 +231,8 @@ def build(cards):
         '<section class="kr-help" aria-label="Подсказки">'
         '<details class="kr-acc" id="kr-howto" open><summary><h2>Как выбрать?</h2>%s</summary><dl class="kr-acc__rows">%s</dl></details>'
         '<details class="kr-acc" id="kr-where" open><summary><h2>Где применяется?</h2>%s</summary><ul class="kr-acc__list">%s</ul></details>'
-        '</section>\n%s\n'
-        '<!--/ropes-->\n') % (side, ''.join(out), ARROW, howto, ARROW, where, pop)
+        '</section>\n'
+        '<!--/ropes-->\n') % (side, ''.join(out), ARROW, howto, ARROW, where)
     sub = ('Для подъёмной, строительной и буровой техники. %d марок, диаметр от %s до %s мм, другие — по запросу.'
            % (len(cards), diams[0], diams[-1]))
     return layout, sub
@@ -288,8 +291,8 @@ CSS = r'''
 .vb-krd .kr-card:hover .kr-card__ph img{transform:scale(1.05)}
 .vb-krd .kr-card__badge{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:30px;background:#fff;color:var(--kc-accent);font-size:11px;font-weight:600}
 .vb-krd .kr-card__title{margin:0 4px 2px;font-family:"Inter",Arial,sans-serif;font-size:16px;line-height:1.35;font-weight:600}
-.vb-krd .kr-card__title button{padding:0;border:0;background:none;color:var(--kc-ink);font:inherit;text-align:left;cursor:pointer;transition:color .2s}
-.vb-krd .kr-card__title button:hover{color:var(--kc-accent)}
+.vb-krd .kr-card__title a{color:var(--kc-ink);text-decoration:none;transition:color .2s}
+.vb-krd .kr-card__title a:hover{color:var(--kc-accent)}
 .vb-krd .kr-card__code{margin:0 4px 8px;font-size:12px;color:var(--kc-muted)}
 .vb-krd .kr-card__text{margin:0 4px 12px;font-size:13px;line-height:1.45;color:rgba(32,49,51,.8)}
 .vb-krd .kr-card__price{margin:auto 4px 10px;font-size:14px;font-weight:600;color:var(--kc-head)}
