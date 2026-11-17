@@ -87,8 +87,9 @@
 
 Отдельная страница `/steel-ropes` собрана из раздела «Стальные канаты» общего каталога по прототипам `design/kordstar-prototypes.fig`.
 
-- `tilda/_doc_steel-ropes.html` — содержимое страницы: 7 видов канатов, поиск, сортировка, подсказки и форма предзаказа.
-- `python tools/tilda_block.py --doc steel-ropes` → `tilda/steel-ropes.html` (вайб-блок) и `tilda/steel-ropes-preview.html` (локальное превью).
+- `data/steel_ropes.json` — 135 уникальных позиций из «Таблица канатов для сайта.xlsx». Одна полностью совпадающая строка источника повторялась дважды и включена один раз. Пустые значения не дополнялись.
+- `py tools/steel_rope_catalog.py` (Windows) или `python3 tools/steel_rope_catalog.py` — обновляет `tilda/_doc_steel-ropes.html`, `tilda/steel-ropes.html`, `tilda/steel-ropes-preview.html` и `steel-ropes.html` для GitHub Pages.
+- Страница содержит поиск, сортировку, фильтры по диаметру, конструкции, покрытию, свивке и применению, характеристики и преимущества каждой позиции. В предзаказ подставляется её полное обозначение с диаметром.
 - Заголовок «Стальные канаты» в общем каталоге ведёт на `/steel-ropes`. Для заявок на странице Тильды нужен блок с формой-приёмником, как описано выше.
 - Если `reference/index.html` отсутствует в клоне GitHub, сборщик использует изображения из `img/` через GitHub Pages.
 
