@@ -37,4 +37,4 @@
 3D icon of a shield with a check mark, glossy translucent glass material in light aqua-teal (#7fd3d6 to #a9e4e6) with soft white highlights, isometric 3/4 view, centered on a pale mint rounded square tile (#eef7f8) with soft rounded corners, soft studio lighting, subtle shadow, minimal, clean, no text, 1:1, 512x512. Match the style of the attached reference icons exactly.
 ```
 
-После этого Claude переведёт их в `img/` (webp 72×72, как остальные иконки) и подставит в карточку.
+Перевести в `img/icon-*.webp` (обрезка под пропорции иконок с главной, 144×144, прозрачные углы): `python tools/icons_prep.py`. Сейчас стоят в карточке 1СК: доставка, документация, гарантия.
