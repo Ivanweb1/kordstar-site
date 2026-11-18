@@ -8,7 +8,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIZE, FILL, RADIUS = 144, 0.68, 0.24
 TILE = (241, 247, 250)   # цвет плашки иконок на главной
-CONTRAST = 2.2           # насколько усилить отличие предмета от плашки (1.35 было бледно рядом с иконками главной)
+CONTRAST = 1.7           # насколько усилить отличие предмета от плашки (подобрано под иконки «soft aqua»)
 
 
 def object_box(im, bg):
@@ -23,7 +23,7 @@ def prep(src, dst):
     im = Image.open(src).convert('RGB')
     w, h = im.size
     # фон плашки в исходнике неровный: оцениваем его сильным размытием по кольцу вокруг предмета
-    bg = im.getpixel((int(w * 0.22), h // 2))
+    bg = im.getpixel((w // 2, int(h * 0.14)))  # над предметом: сбоку широкий предмет (грузовик) закрывает фон
     l, t, r, b = object_box(im, bg)
     cx, cy = (l + r) / 2, (t + b) / 2
     side = max(r - l, b - t) / FILL
