@@ -8,15 +8,19 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIZE, FILL, RADIUS = 144, 0.68, 0.24
 TILE = (241, 247, 250)   # цвет плашки иконок на главной
-CONTRAST = 1.7           # насколько усилить отличие предмета от плашки (подобрано под иконки «soft aqua»)
+CONTRAST = 1.35          # насколько усилить отличие предмета от плашки
 
 
 def object_box(im, bg):
+    """Рамка предмета: предмет бирюзовый, плашка почти белая — ищем по насыщенности цвета.
+    Край картинки (8%) не смотрим: там бывает ободок плашки."""
     w, h = im.size
-    diff = ImageChops.difference(im, Image.new('RGB', im.size, bg)).convert('L')
-    inner = diff.crop((int(w * .2), int(h * .2), int(w * .8), int(h * .8))).point(lambda v: 255 if v > 18 else 0)
-    l, t, r, b = inner.filter(ImageFilter.MaxFilter(5)).getbbox()
-    return l + int(w * .2), t + int(h * .2), r + int(w * .2), b + int(h * .2)
+    m = 0.08
+    x0, y0 = int(w * m), int(h * m)
+    sat = im.convert('HSV').split()[1].crop((x0, y0, int(w * (1 - m)), int(h * (1 - m))))
+    mask = sat.point(lambda v: 255 if v > 45 else 0).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(5))
+    l, t, r, b = mask.getbbox()
+    return l + x0, t + y0, r + x0, b + y0
 
 
 def prep(src, dst):
@@ -29,7 +33,9 @@ def prep(src, dst):
     side = max(r - l, b - t) / FILL
     box = (int(cx - side / 2), int(cy - side / 2), int(cx + side / 2), int(cy + side / 2))
     crop = Image.new('RGB', (box[2] - box[0], box[3] - box[1]), bg)
-    crop.paste(im.crop(box), (0, 0))
+    # берём только ту часть, что есть в исходнике: за краем картинки Pillow отдаёт чёрное
+    inner = (max(box[0], 0), max(box[1], 0), min(box[2], w), min(box[3], h))
+    crop.paste(im.crop(inner), (inner[0] - box[0], inner[1] - box[1]))
     crop = crop.resize((SIZE * 2, SIZE * 2), Image.LANCZOS)
     n = SIZE * 2
     # локальный фон: размытая копия, где предмет закрашен цветом плашки исходника
@@ -54,6 +60,7 @@ def prep(src, dst):
 
 
 sys.stdout.reconfigure(encoding='utf-8')
-for f in sorted(glob.glob(os.path.join(ROOT, 'design', 'icons', 'new', '*.png'))):
-    name = os.path.splitext(os.path.basename(f))[0]
+# только иконки сайта; черновики генераций (*-v2.png и т.п.) в той же папке не трогаем
+for name in ('delivery', 'docs', 'warranty'):
+    f = os.path.join(ROOT, 'design', 'icons', 'new', name + '.png')
     prep(f, os.path.join(ROOT, 'img', 'icon-%s.webp' % name))
