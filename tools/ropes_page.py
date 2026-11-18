@@ -254,7 +254,14 @@ def build(cards):
 CSS = r'''
 /*ropes*/
 .vb-krd .vb-krd-cat .kr-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;align-items:start}
-.vb-krd .kr-side{position:sticky;top:96px;max-height:calc(100vh - 120px);overflow:auto;padding:22px 20px;border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(32,64,67,.05);scrollbar-width:thin}
+.vb-krd .kr-side{position:sticky;top:96px;max-height:calc(100vh - 120px);overflow:auto;padding:22px 20px;border-radius:24px;background:#fff;box-shadow:0 10px 30px rgba(32,64,67,.05)}
+/* скролл фильтров в цветах сайта: тонкий, скруглённый, без стрелок; дорожка не заходит на скругления панели */
+.vb-krd .kr-side::-webkit-scrollbar{width:6px}
+.vb-krd .kr-side::-webkit-scrollbar-button{display:none;height:0}
+.vb-krd .kr-side::-webkit-scrollbar-track{margin:20px 0;background:transparent}
+.vb-krd .kr-side::-webkit-scrollbar-thumb{border-radius:6px;background:#d3e3e4}
+.vb-krd .kr-side::-webkit-scrollbar-thumb:hover{background:#69979c}
+@supports not selector(::-webkit-scrollbar){.vb-krd .kr-side{scrollbar-width:thin;scrollbar-color:#d3e3e4 transparent}}
 .vb-krd .kr-side__title{margin:0 0 4px;font-family:"Montserrat",Arial,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--kc-head)}
 .vb-krd .kr-close,.vb-krd .kr-open{display:none}
 .vb-krd .kr-f-group{margin:16px 0 0;padding:16px 0 0;border-top:1px solid var(--kc-line)}
