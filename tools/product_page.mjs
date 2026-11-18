@@ -1,4 +1,4 @@
-// Карточка товара 1СК: вайб-блок Тильды, превью и страница для GitHub Pages.
+// Карточка товара (страница /strop-1sk, сейчас — канат 6x19W-IWRC-sZ-Ung-1960 из data/steel-ropes.xlsx): вайб-блок Тильды, превью и страница для GitHub Pages.
 // Запуск: node tools/product_page.mjs  (после python tools/catalog_page.py, если каталог пересобирался)
 //
 // Содержимое карточки — tilda/_doc_strop-1sk.html. Шапку, подвал, плашку cookie и поп-апы главной
@@ -27,7 +27,7 @@ const ghLinks = (html) => html
   .replaceAll('href="/"', `href="${BASE}/"`);
 
 const preview = read('tilda/strop-1sk-preview.html')
-  .replace('<title>Превью вайб-блока</title>', '<title>Строп канатный 1СК — Кордстар</title>');
+  .replace('<title>Превью вайб-блока</title>', '<title>Канат 6x19W-IWRC-sZ-Ung-1960 — Кордстар</title>');
 write('tilda/strop-1sk-preview.html', preview);
 write('strop-1sk.html', ghLinks(preview));
 

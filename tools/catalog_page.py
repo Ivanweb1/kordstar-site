@@ -101,7 +101,7 @@ def count(c):
 
 def card(cat, title, text, button, popup, rank):
     cid, cname, icon = cat[0], cat[1], cat[2]
-    detail = ('<a class="kc-card__detail" href="/strop-1sk">Строп 1СК →</a>'
+    detail = (''  # карточка /strop-1sk теперь про канат 6x19W-IWRC, ссылку со стропов убрали
               if title == 'Канатные ветвевые стропы' else '')
     return (
         '<article class="kc-card%s" data-kc-cat="%s" data-kc-name="%s" data-kc-rank="%d">'
