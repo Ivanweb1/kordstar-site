@@ -8,7 +8,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIZE, FILL, RADIUS = 144, 0.68, 0.24
 TILE = (241, 247, 250)   # цвет плашки иконок на главной
-CONTRAST = 1.35          # насколько усилить отличие предмета от плашки
+CONTRAST = 2.2           # насколько усилить отличие предмета от плашки (1.35 было бледно рядом с иконками главной)
 
 
 def object_box(im, bg):
