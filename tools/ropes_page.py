@@ -236,7 +236,7 @@ def build(cards):
         '<option value="d">диаметру</option><option value="name">названию</option></select></div></div>\n'
         '<div class="kr-bar"><p class="kr-found">Найдено: <b data-kr-total></b></p><div class="kr-picked" data-kr-picked></div></div>\n'
         '<div class="kr-grid">%s</div>\n'
-        '<div class="kc-empty"><p>Под эти параметры марок нет. Измените фильтры или оставьте заявку — подберём канат.</p>'
+        '<div class="kc-empty"><p>Под эти параметры позиций нет. Измените фильтры или оставьте заявку — подберём канат.</p>'
         '<button type="button" data-kc-reset>Сбросить фильтры</button></div>\n'
         '</div>\n</div>\n'
         '<section class="kr-help" aria-label="Подсказки">'
@@ -245,7 +245,7 @@ def build(cards):
         '</section>\n'
         '<!--/ropes-->\n') % (side, ARROW, ''.join(out), ARROW, howto, ARROW, where)
     n = len(cards)
-    word = 'марок' if 11 <= n % 100 <= 14 else {1: 'марка', 2: 'марки', 3: 'марки', 4: 'марки'}.get(n % 10, 'марок')
+    word = 'позиций' if 11 <= n % 100 <= 14 else {1: 'позиция', 2: 'позиции', 3: 'позиции', 4: 'позиции'}.get(n % 10, 'позиций')
     sub = ('Для подъёмной, строительной и буровой техники. <br>%d %s, диаметр от %s до %s мм, другие — по запросу.'
            % (n, word, diams[0], diams[-1]))
     return layout, sub
@@ -498,10 +498,10 @@ JS = r'''
   }
   function plural(n) {
     var a = n % 10, b = n % 100;
-    if (b >= 11 && 14 >= b) return n + ' марок';
-    if (a === 1) return n + ' марка';
-    if (a >= 2 && 4 >= a) return n + ' марки';
-    return n + ' марок';
+    if (b >= 11 && 14 >= b) return n + ' позиций';
+    if (a === 1) return n + ' позиция';
+    if (a >= 2 && 4 >= a) return n + ' позиции';
+    return n + ' позиций';
   }
   function chip(text, act) {
     var b = document.createElement('button');
@@ -549,7 +549,7 @@ JS = r'''
     });
     root.querySelectorAll('[data-kr-total]').forEach(function (el) { el.textContent = plural(shown); });
     root.querySelector('[data-kr-active]').textContent = total ? total : '';
-    root.querySelector('.kr-apply').textContent = 'Показать ' + plural(shown);
+    root.querySelector('.kr-apply').textContent = 'Показать ' + plural(shown).replace(/ позиция$/, ' позицию');
     empty.classList.toggle('is-shown', !shown);
   }
 

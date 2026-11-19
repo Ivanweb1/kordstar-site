@@ -147,7 +147,7 @@ LOADER = r'''
     list.forEach(function (r) { r.rows.forEach(function (x) { var n = num(x[0]); if (ds.indexOf(n) === -1) ds.push(n); }); });
     ds.sort(function (a, b) { return a - b; });
     var n = list.length, a = n %% 10, b = n %% 100;
-    var word = (b >= 11 && 14 >= b) ? 'марок' : a === 1 ? 'марка' : (a >= 2 && 4 >= a) ? 'марки' : 'марок';
+    var word = (b >= 11 && 14 >= b) ? 'позиций' : a === 1 ? 'позиция' : (a >= 2 && 4 >= a) ? 'позиции' : 'позиций';
     sub.textContent = n + ' ' + word + ', диаметр от ' + lbl(ds[0]) + ' до ' + lbl(ds[ds.length - 1]) + ' мм, другие — по запросу.';
   }
 
