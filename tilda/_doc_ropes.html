@@ -328,9 +328,17 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
   var root = document.getElementById('kd-catalog');
   if (!root) return;
   var wrap = root.querySelector('.kc-wrap');
+  var sideBox = root.querySelector('[data-kr-side]');
   function fit() {
     var w = document.documentElement.clientWidth;
-    wrap.style.zoom = w >= 960 && w !== 1200 ? String(w / 1200) : '';
+    var z = w >= 960 && w !== 1200 ? w / 1200 : 1;
+    wrap.style.zoom = z === 1 ? '' : String(z);
+    // zoom растягивает и высоту панели фильтров: пересчитываем, чтобы она целиком помещалась в окно
+    // и прокручивалась сама, а не уходила низом за экран
+    if (sideBox) {
+      sideBox.style.top = w >= 960 ? (96 / z) + 'px' : '';
+      sideBox.style.maxHeight = w >= 960 ? ((window.innerHeight - 120) / z) + 'px' : '';
+    }
   }
   fit();
   window.addEventListener('resize', fit);
