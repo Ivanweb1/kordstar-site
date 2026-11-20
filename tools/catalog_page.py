@@ -93,9 +93,17 @@ WHERE = [
 
 E = html.escape
 
+# Разделы, которые пока не работают: в боковом меню и чипсах — серые и некликабельные,
+# в списке справа — только заголовок раздела, без товаров.
+INACTIVE = {'slings', 'parts-slings', 'rigging', 'spare', 'drill'}
+
 
 def count(c):
     return len(c[4]) if c[4] else 1
+
+
+def total():
+    return sum(count(c) for c in CATS if c[0] not in INACTIVE)
 
 
 def card(cat, title, text, button, popup, rank):
@@ -119,6 +127,11 @@ def groups():
     out = []
     for c in CATS:
         cid, cname, icon, lead, items, req = c
+        if cid in INACTIVE:
+            out.append(
+                '<section class="kc-group kc-group--off" data-kc-group="%s" data-kc-off>'
+                '<div class="kc-group__head"><h2 class="kc-group__title">%s</h2></div></section>' % (cid, E(cname)))
+            continue
         if items:
             cards = ''.join(card(c, t, d, 'Предзаказ', 'order', i) for i, (t, d) in enumerate(items))
         else:
@@ -133,18 +146,23 @@ def groups():
 
 
 def chips():
-    total = sum(count(c) for c in CATS)
-    out = ['<button class="kc-chip is-active" type="button" data-kc-show="all" aria-pressed="true">Все <span>%d</span></button>' % total]
-    out += ['<button class="kc-chip" type="button" data-kc-show="%s" aria-pressed="false">%s <span>%d</span></button>'
-            % (c[0], E(c[1]), count(c)) for c in CATS]
+    out = ['<button class="kc-chip is-active" type="button" data-kc-show="all" aria-pressed="true">Все <span>%d</span></button>' % total()]
+    for c in CATS:
+        if c[0] in INACTIVE:
+            out.append('<button class="kc-chip" type="button" disabled>%s</button>' % E(c[1]))
+        else:
+            out.append('<button class="kc-chip" type="button" data-kc-show="%s" aria-pressed="false">%s <span>%d</span></button>'
+                       % (c[0], E(c[1]), count(c)))
     return ''.join(out)
 
 
 def side():
-    total = sum(count(c) for c in CATS)
-    out = ['<li><button type="button" class="is-active" data-kc-show="all">Все товары<span>%d</span></button></li>' % total]
-    out += ['<li><button type="button" data-kc-show="%s">%s<span>%d</span></button></li>' % (c[0], E(c[1]), count(c))
-            for c in CATS]
+    out = ['<li><button type="button" class="is-active" data-kc-show="all">Все товары<span>%d</span></button></li>' % total()]
+    for c in CATS:
+        if c[0] in INACTIVE:
+            out.append('<li><button type="button" disabled>%s</button></li>' % E(c[1]))
+        else:
+            out.append('<li><button type="button" data-kc-show="%s">%s<span>%d</span></button></li>' % (c[0], E(c[1]), count(c)))
     return ''.join(out)
 
 
@@ -267,7 +285,12 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-side li button{display:flex;justify-content:space-between;align-items:baseline;gap:12px;width:100%;padding:9px 12px;border:0;border-radius:12px;background:none;text-align:left;font-size:14px;line-height:1.35;color:var(--kc-ink);cursor:pointer;transition:background-color .2s,color .2s}
 .vb-krd .kc-side li button:hover{background:var(--kc-soft)}
 .vb-krd .kc-side li button.is-active{background:var(--kc-soft);color:var(--kc-accent);font-weight:600}
+.vb-krd .kc-side li button:disabled{color:#a9b8b9;cursor:default;background:none}
+.vb-krd .kc-chip:disabled{color:#a9b8b9;cursor:default;border-color:var(--kc-line)}
 .vb-krd .kc-group+.kc-group{margin-top:48px}
+.vb-krd .kc-group--off+.kc-group--off{margin-top:20px}
+.vb-krd .kc-group--off .kc-group__head{margin:0}
+.vb-krd .kc-group--off .kc-group__title{margin:0}
 .vb-krd .kc-group[hidden],.vb-krd .kc-card[hidden]{display:none}
 .vb-krd .kc-group__head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 20px}
 .vb-krd .kc-group__title{margin:0 0 6px;font-family:"Montserrat",Arial,sans-serif;font-size:22px;line-height:1.2;font-weight:700;color:var(--kc-head)}
@@ -383,6 +406,7 @@ JS = r"""
     groups.forEach(function (g) {
       var id = g.getAttribute('data-kc-group');
       var inCat = current === 'all' || current === id;
+      if (g.hasAttribute('data-kc-off')) { g.hidden = current !== 'all' || !!q; return; }
       var n = 0;
       [].slice.call(g.querySelectorAll('.kc-card')).forEach(function (c) {
         var hit = !q || c.getAttribute('data-kc-name').indexOf(q) !== -1 ||
@@ -401,6 +425,7 @@ JS = r"""
     var byName = sort.value === 'name';
     groups.forEach(function (g) {
       var grid = g.querySelector('.kc-grid');
+      if (!grid) return;
       [].slice.call(grid.children).sort(function (a, b) {
         if (byName) return a.querySelector('.kc-card__title').textContent.localeCompare(b.querySelector('.kc-card__title').textContent, 'ru');
         return a.getAttribute('data-kc-rank') - b.getAttribute('data-kc-rank');
@@ -456,7 +481,7 @@ JS = r"""
   sort.addEventListener('change', function () { order(); apply(); });
 
   var start = (location.hash || '').slice(1);
-  show(root.querySelector('.kc-chip[data-kc-show="' + start + '"]') ? start : 'all', false);
+  show(start && root.querySelector('.kc-chip[data-kc-show="' + start + '"]') ? start : 'all', false);
 })();
 """
 
@@ -469,7 +494,7 @@ PAGE = (
     '<nav class="kc-crumbs" aria-label="Навигация"><button type="button" data-kc-back>Назад</button><i>|</i>'
     '<a href="/">Главная</a><i>/</i><span>Каталог</span></nav>\n'
     '<div class="kc-top"><div><h1 class="kc-title">Каталог</h1>'
-    '<p class="kc-sub">Канаты, стропы, такелаж и комплектующие&nbsp;— %(total)d позиций в %(ncat)d разделах</p></div>'
+    '<p class="kc-sub">Канаты, стропы, такелаж и комплектующие</p></div>'
     '<div class="kc-help"><button type="button" data-krd-popup="howto">Как выбрать?</button>'
     '<button type="button" data-krd-popup="where">Где применяется?</button></div></div>\n'
     '<div class="kc-layout">\n'
@@ -496,7 +521,7 @@ PAGE = (
     '<style>\n%(css)s\n</style>\n'
     '<script>%(js)s</script>\n'
     '<!--krd-pops-->\n%(pops)s\n<!--/krd-pops-->\n'
-) % dict(total=sum(count(c) for c in CATS), ncat=len(CATS), chips=chips(), icon=SEARCH_ICON, side=side(), groups=groups(), css=CSS.strip(), js=JS, pops=POPS)
+) % dict(total=total(), ncat=len(CATS), chips=chips(), icon=SEARCH_ICON, side=side(), groups=groups(), css=CSS.strip(), js=JS, pops=POPS)
 
 assert '<' not in JS, 'в скрипте не должно быть «<»'
 
