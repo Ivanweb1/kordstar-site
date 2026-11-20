@@ -127,8 +127,8 @@
 **Файлы**
 
 - `tools/ropes_to_tilda.py` → `data/ropes-tilda.json`: товары из `data/steel-ropes.xlsx` (разбор и исправления — из `tools/ropes_page.py`). Первичная заливка 31 марки (135 диаметров) сделана через MCP `tilda-kordstar` (`store_create_products` + `store_save_products`); uid товаров — в этом JSON. Дальше каталог ведётся в Тильде, таблица больше не источник.
-- `tools/ropes_dynamic.py` → `tilda/_doc_ropes.html` → `tilda/ropes.html` (вайб-блок страницы `/steel-ropes`, Тильда: страница 399553709). Берёт готовую статичную страницу `tilda/_doc_steel-ropes.html`, убирает из неё карточки и списки фильтров и добавляет загрузку из каталога; прежний скрипт страницы запускается после загрузки. Сначала `python tools/ropes_page.py`, потом `python tools/ropes_dynamic.py`.
-- `tools/product_template.py` → `tilda/_doc_product.html` (из `tilda/_doc_strop-1sk.html`), затем `python tools/tilda_block.py --doc product` → `tilda/product.html` (вайб-блок страницы `/product`, Тильда: страница 399553809). Карточка открывается как `/product?p=<uid товара>&s=<uid раздела>` — эти ссылки ставит каталог. Стандартная страница Тильды `/tproduct/…` не используется.
+- `tools/ropes_dynamic.py` → `tilda/_doc_ropes.html` → `tilda/ropes.html` (вайб-блок страницы `/steel-ropes`, Тильда: страница 403933209). Берёт готовую статичную страницу `tilda/_doc_steel-ropes.html`, убирает из неё карточки и списки фильтров и добавляет загрузку из каталога; прежний скрипт страницы запускается после загрузки. Сначала `python tools/ropes_page.py`, потом `python tools/ropes_dynamic.py`.
+- `tools/product_template.py` → `tilda/_doc_product.html` (из `tilda/_doc_strop-1sk.html`), затем `python tools/tilda_block.py --doc product` → `tilda/product.html` (вайб-блок страницы `/product`, Тильда: страница 403933309). Карточка открывается как `/product?p=<uid товара>&s=<uid раздела>` — эти ссылки ставит каталог. Стандартная страница Тильды `/tproduct/…` не используется.
 - `tilda_block.py` заменяет длинные числа в коде короткими метками — поэтому номер раздела в `ropes_dynamic.py` записан частями (`['434043', '879043'].join('')`).
 
 **Обновить вёрстку на Тильде**
