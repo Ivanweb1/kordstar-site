@@ -346,7 +346,7 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 
   // номер раздела записан частями: tilda_block.py заменяет длинные числа в коде короткими метками
   var PART = ['434043', '879043'].join(''), PRODUCT = '/product', ICON = 'img/Frame_2136139848-32303965.webp';
-  var ORD = {"c": ["35WxK7", "34WxK7", "24WxK7", "19xK7", "18xK7", "16xK7", "15xK7", "8xK26WS", "8xK36WS", "6x19W", "4xV39S", "6x36", "ГОСТ 7668-80", "ГОСТ 7669-80", "ГОСТ 2688-80"], "k": ["Galv (оцинкованный)", "Ung (неоцинкованный)"], "l": ["zZ (RHLL)", "sS (LHLL)", "sZ (RHRL)", "zS (LHRL)"], "a": ["Буровая установка", "Башенный кран", "Автокран", "Гусеничный кран", "Мостовой кран", "Козловой кран", "Манипулятор", "Трубоукладчик", "Эвакуатор", "Лебедка", "Растяжка"]};
+  var ORD = {"c": ["35WxK7", "34WxK7", "24WxK7", "19xK7", "18xK7", "16xK7", "15xK7", "8xK26WS", "8xK36WS", "6x19W", "4xV39S", "6x36", "ГОСТ 7668-80", "ГОСТ 7669-80", "ГОСТ 2688-80"], "k": ["Galv (оцинкованный)", "Ung (неоцинкованный)"], "l": ["zZ (RHLL)", "sS (LHLL)", "sZ (RHRL)", "zS (LHRL)"], "a": ["Буровая установка", "Башенный кран", "Автокран", "Гусеничный кран", "Мостовой кран", "Козловой кран", "Манипулятор", "Трубоукладчик", "Эвакуатор", "Лебедка", "Растяжка", "Экскаватор", "Лифт", "Иное"]};
   var LAYF = {"sZ": "sZ (RHRL)", "zZ": "zZ (RHLL)", "sS": "sS (LHLL)", "zS": "zS (LHRL)"};
   var host = 'store.tildaapi.com';
   function mk(tag, cls, text) {
@@ -385,11 +385,13 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
       if (m) m[1].split(';').forEach(function (d) { apps[num(d)] = splitList(c.value); });
       else if (c.title === 'Применение') common = splitList(c.value);
     });
-    var opts = arr(p.json_options), axis = opts[0] && opts[0].title;
+    // ось диаметров: «Диаметр, мм», у ГОСТ-канатов есть ещё «Прочность, Н/мм²» — один диаметр повторяется
+    var opts = arr(p.json_options), axis = (opts.filter(function (o) { return o.title === 'Диаметр, мм'; })[0] || opts[0] || {}).title;
+    var seen = {};
     var rows = arr(p.editions).map(function (e) {
       var n = num(axis ? e[axis] : '');
       return [lbl(n), apps[n] || common || []];
-    }).filter(function (r) { return num(r[0]) > 0; }).sort(function (a, b) { return num(a[0]) - num(b[0]); });
+    }).filter(function (r) { if (!(num(r[0]) > 0) || seen[r[0]]) return false; seen[r[0]] = 1; return true; }).sort(function (a, b) { return num(a[0]) - num(b[0]); });
     var code = by['Марка'] || p.sku || p.title;
     var constr = by['Конструкция'] || '';
     var lay = by['Обозначение свивки'] || '';

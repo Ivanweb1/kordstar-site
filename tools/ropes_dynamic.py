@@ -62,11 +62,13 @@ LOADER = r'''
       if (m) m[1].split(';').forEach(function (d) { apps[num(d)] = splitList(c.value); });
       else if (c.title === 'Применение') common = splitList(c.value);
     });
-    var opts = arr(p.json_options), axis = opts[0] && opts[0].title;
+    // ось диаметров: «Диаметр, мм», у ГОСТ-канатов есть ещё «Прочность, Н/мм²» — один диаметр повторяется
+    var opts = arr(p.json_options), axis = (opts.filter(function (o) { return o.title === 'Диаметр, мм'; })[0] || opts[0] || {}).title;
+    var seen = {};
     var rows = arr(p.editions).map(function (e) {
       var n = num(axis ? e[axis] : '');
       return [lbl(n), apps[n] || common || []];
-    }).filter(function (r) { return num(r[0]) > 0; }).sort(function (a, b) { return num(a[0]) - num(b[0]); });
+    }).filter(function (r) { if (!(num(r[0]) > 0) || seen[r[0]]) return false; seen[r[0]] = 1; return true; }).sort(function (a, b) { return num(a[0]) - num(b[0]); });
     var code = by['Марка'] || p.sku || p.title;
     var constr = by['Конструкция'] || '';
     var lay = by['Обозначение свивки'] || '';

@@ -3,10 +3,12 @@
 # Запуск: python tools/ropes_extra_to_tilda.py  → data/ropes-tilda-extra.json (поля для store_save_products через MCP).
 #
 # В листах ГОСТ свивка и прочность записаны через дробь, чтобы сократить таблицу:
-# «sZ / zS» → два товара (sZ и zS), прочность «1770/1860/1960» остаётся одной характеристикой.
+# «sZ / zS» → два товара (sZ и zS). Прочность «1770/1860/1960» — и характеристика одной строкой, и вторая ось
+# вариантов «Прочность, Н/мм²»: покупатель выбирает её на карточке так же, как диаметр (решение заказчика 20.11.2026).
 # Конструкция товара по ГОСТ — «6x19-FC ГОСТ 2688-80»: каталог показывает в фильтре «ГОСТ 2688-80».
 # Применение приводится к названиям фильтра («башеный кран» → «Башенный кран», «экскаваторы» → «Экскаватор»,
-# «гусеничныйи кран» → «Гусеничный кран», «Лифты» → «Лифт»), «иное» в фильтр не идёт.
+# «гусеничныйи кран» → «Гусеничный кран», «Лифты» → «Лифт»). «Иное» остаётся пунктом фильтра (последним):
+# канаты по ГОСТ применяются шире, чем перечислено в фильтре. Из описаний 6x36 по ГОСТ 7669-80 убрано «(ЛК-РО)».
 import json, os, re, sys
 from collections import OrderedDict
 
@@ -19,13 +21,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(ROOT, 'data', 'ropes-gost-lifts.xlsx')
 OUT = os.path.join(ROOT, 'data', 'ropes-tilda-extra.json')
 AXIS = 'Диаметр, мм'
+AXIS2 = 'Прочность, Н/мм²'
 PART = '434043879043'
 
 APP = {'лебедка': 'Лебедка', 'лебёдка': 'Лебедка', 'растяжка': 'Растяжка', 'эвакуатор': 'Эвакуатор',
        'козловой кран': 'Козловой кран', 'мостовой кран': 'Мостовой кран', 'башеный кран': 'Башенный кран',
        'башенный кран': 'Башенный кран', 'манипулятор': 'Манипулятор', 'автокран': 'Автокран',
        'буровая установка': 'Буровая установка', 'трубоукладчик': 'Трубоукладчик', 'гусеничный кран': 'Гусеничный кран', 'гусеничныйи кран': 'Гусеничный кран',
-       'экскаватор': 'Экскаватор', 'экскаваторы': 'Экскаватор', 'лифт': 'Лифт', 'лифты': 'Лифт', 'иное': None}
+       'экскаватор': 'Экскаватор', 'экскаваторы': 'Экскаватор', 'лифт': 'Лифт', 'лифты': 'Лифт', 'иное': 'Иное'}
 LAY = {'sZ': ('Правая', 'Крестовая'), 'zS': ('Левая', 'Крестовая'), 'zZ': ('Правая', 'Односторонняя'),
        'sS': ('Левая', 'Односторонняя')}
 CORE = {'Органический сердечник (FC)': ('FC', 'Органический (FC)'), 'Стальной': ('IWRC', 'Стальной (IWRC)'),
@@ -58,7 +61,7 @@ def apps(v):
 
 def strength(v):
     nums = re.findall(r'\d{4}', s(v))
-    return ('/'.join(nums), ' / '.join(nums) + ' Н/мм²')
+    return ('/'.join(nums), ' / '.join(nums) + ' Н/мм²', nums)
 
 
 def rows(ws):
@@ -76,7 +79,7 @@ def rows(ws):
                    strands=s(r[col('Количество прядей')]), core=s(r[col('Сердечник')]),
                    lays=[x.strip() for x in s(r[col('Обозначение свивки')]).split('/')],
                    nonrot=s(r[col('Некрутящийся канат')]), strength=strength(r[col('Временное сопротивление разрыву проволоки')]),
-                   desc=s(r[col('Описание канатов')]), adv=[s(r[i]) for i in adv if s(r[i])],
+                   desc=re.sub(r'\s*\(ЛК-РО\)', '', s(r[col('Описание канатов')])), adv=[s(r[i]) for i in adv if s(r[i])],
                    cert=s(r[col('Сертификаты')]))
 
 
@@ -123,13 +126,20 @@ def products():
             assert len(t) <= 40, t
         desc = max(set(m['descs']), key=m['descs'].count)
         title = 'Канат ' + (m['constr'] + ' ГОСТ ' + m['gost'] if m['gost'] else m['base'])
+        # варианты: диаметр × прочность (если прочностей несколько)
+        strs = m['strength'][2] if len(m['strength'][2]) > 1 else []
+        combos = [(d, st) for d, _ in rows_ for st in (strs or [''])]
+        editions = {'uid': [''] * len(combos),
+                    'sku': ['%s-%s' % (m['code'].rsplit('-', 1)[0] + ('-' + st if st else '-' + m['strength'][0]), d.replace(',', '.'))
+                            for d, st in combos],
+                    'price': ['0'] * len(combos), AXIS: [d for d, _ in combos]}
+        if strs:
+            editions[AXIS2] = [st for _, st in combos]
         items.append(dict(
             title=title, sku=m['code'], descr=desc,
             text=''.join(__import__('ropes_to_tilda').adv_p(a) for a in m['adv']),
             characteristics=dict(title=[t for t, _ in chars], value=[str(v) for _, v in chars]),
-            editions={'uid': [''] * len(rows_),
-                      'sku': ['%s-%s' % (m['code'], d.replace(',', '.')) for d, _ in rows_],
-                      'price': ['0'] * len(rows_), AXIS: [d for d, _ in rows_]},
+            editions=editions,
             partuids=PART))
     return items
 
@@ -146,10 +156,13 @@ def main():
     json.dump(items, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('товаров: %d, вариантов: %d -> %s' % (len(items), sum(len(i['editions']['sku']) for i in items), os.path.relpath(OUT, ROOT)))
     for it in items:
+        assert len(set(it['editions']['sku'])) == len(it['editions']['sku']), it['sku']
         ch = dict(zip(it['characteristics']['title'], it['characteristics']['value']))
         ap = [v for t, v in ch.items() if t.startswith('Применение')]
-        print('%s | %s | %d диам. %s–%s | применение: %d групп(ы), %s' % (
-            it['title'], it['sku'], len(it['editions']['sku']), it['editions'][AXIS][0], it['editions'][AXIS][-1],
+        ds = sorted(set(it['editions'][AXIS]), key=lambda x: float(x.replace(',', '.')))
+        st = sorted(set(it['editions'].get(AXIS2, [])))
+        print('%s | %s | %d диам. %s–%s%s | применение: %d групп(ы), %s' % (
+            it['title'], it['sku'], len(ds), ds[0], ds[-1], ' × прочность ' + '/'.join(st) if st else '',
             len(ap), ' + '.join(sorted({a for v in ap for a in v.split(', ')}))))
 
 

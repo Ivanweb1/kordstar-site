@@ -90,6 +90,8 @@ LOADER = r'''
         else if(n.nodeType===1){var t=/^(B|STRONG)$/.test(n.tagName)?el('b',null,n.textContent):document.createTextNode(n.textContent);li.appendChild(t)}
       });if(li.textContent.trim())out.push(li)});
     return out}
+  var EDS=[],AXIS='',EXTRA=[];
+  function uniq(eds,t){var u=[];eds.forEach(function(e){var v=e[t];if(v!=null&&v!==''&&u.indexOf(v)===-1)u.push(v)});return u.sort(function(a,b){return num(a)-num(b)})}
   function row(dt,dd,wrap){var d=el('div');d.appendChild(el('dt',null,dt));d.appendChild(el('dd',null,dd));wrap.appendChild(d)}
   function render(p){
     var chars=arr(p.characteristics), by={};
@@ -100,14 +102,26 @@ LOADER = r'''
     setText('descr',p.descr||'');setText('descr2',p.descr||'');setText('code-title',code?String(p.title).split(' ')[0]+' '+code:p.title);
     var name=code?String(p.title).split(' ')[0]+' '+code:p.title;setText('pop-name',name);setText('cert-name',name);
     [].forEach.call(fa('pop-input'),function(i){i.value=name});
-    // варианты (диаметры)
-    var opts=arr(p.json_options), axis=opts[0]&&opts[0].title, eds=arr(p.editions);
+    // варианты: диаметры + другие оси (у ГОСТ-канатов — «Прочность, Н/мм²»), каждая — свой ряд кнопок
+    var opts=arr(p.json_options).map(function(o){return o.title}).filter(Boolean), eds=arr(p.editions);
+    var axis=opts.indexOf('Диаметр, мм')>-1?'Диаметр, мм':opts[0];
+    EDS=eds;AXIS=axis;EXTRA=opts.filter(function(t){return t!==axis});
     var list=f('diam-list');
     if(axis&&eds.length){
       setText('axis',axis);f('diams').setAttribute('aria-label',axis);
-      eds.slice().sort(function(a,b){return num(a[axis])-num(b[axis])}).forEach(function(e){
-        var b=el('button','kp-d',e[axis]);b.type='button';b.setAttribute('data-kp-d',e[axis]);b.setAttribute('aria-pressed','false');
-        b.setAttribute('data-kp-price',e.price||'');list.appendChild(b)});
+      uniq(eds,axis).forEach(function(v){
+        var b=el('button','kp-d',v);b.type='button';b.setAttribute('data-kp-d',v);b.setAttribute('aria-pressed','false');list.appendChild(b)});
+      var after=f('diams');
+      EXTRA.forEach(function(t){
+        var g=after.cloneNode(true);[].forEach.call(g.querySelectorAll('[data-kp-f]'),function(n){n.removeAttribute('data-kp-f')});g.removeAttribute('data-kp-f');
+        g.setAttribute('aria-label',t);g.querySelector('b').textContent=t;var gl=g.querySelector('div');gl.textContent='';
+        uniq(eds,t).forEach(function(v){var b=el('button','kp-d',v);b.type='button';b.setAttribute('data-kp-o',t);b.setAttribute('data-kp-v',v);b.setAttribute('aria-pressed','false');gl.appendChild(b)});
+        after.parentNode.insertBefore(g,after.nextSibling);after=g;
+        // заявка: выбранное значение уходит отдельной строкой, как диаметр
+        var name=t.split(',')[0];
+        [].forEach.call(document.querySelectorAll('.kp-pick'),function(pk){var em=el('em',null,name+': ');var sp=el('span',null,'не выбрана');sp.setAttribute('data-kp-opt-show',t);em.appendChild(sp);pk.appendChild(em)});
+        [].forEach.call(document.querySelectorAll('[data-kp-diam]'),function(inp){var h=el('input');h.type='hidden';h.name='opt'+EXTRA.indexOf(t);h.setAttribute('data-label',t);h.setAttribute('data-kp-opt',t);inp.parentNode.insertBefore(h,inp.nextSibling)});
+      });
     } else f('diams').hidden=true;
     // цена: у вариантов или у товара; 0 — «По запросу»
     var prices=eds.map(function(e){return num(e.price)}).filter(function(n){return n>0});
@@ -128,7 +142,7 @@ LOADER = r'''
     if(!f('apps').children.length){f('apps').hidden=true;f('apps-title').hidden=true}
     // все характеристики
     var all=f('chars');
-    if(axis&&eds.length)row(axis,eds.map(function(e){return e[axis]}).sort(function(a,b){return num(a)-num(b)}).join('; '),all);
+    if(axis&&eds.length)row(axis,uniq(eds,axis).join('; '),all);
     chars.forEach(function(c){if(!hidden(c.title))row(c.title,c.value,all)});
     if(by['Сертификаты'])setText('cert',by['Сертификаты']);
     // фото: из каталога; если нет — остаются общие фото карточки
@@ -141,10 +155,19 @@ LOADER = r'''
     setText('caption',p.title);var cap=root.querySelector('[data-kp-caption]');if(cap)cap.textContent=p.title;
     root.classList.remove('is-loading');window.dispatchEvent(new Event('resize'));
   }
-  // смена диаметра — цена варианта
-  root.addEventListener('click',function(e){var d=e.target.closest('[data-kp-d]');if(!d)return;setTimeout(function(){
-    var pr=f('price'),on=d.getAttribute('aria-pressed')==='true',v=money(d.getAttribute('data-kp-price'));
-    pr.textContent=on&&v?v:pr.getAttribute('data-kp-base')},0)});
+  // выбор прочности (и других осей кроме диаметра): одна кнопка в ряду, значение — в заявку
+  root.addEventListener('click',function(e){var o=e.target.closest('[data-kp-o]');if(!o)return;
+    var t=o.getAttribute('data-kp-o'),on=o.getAttribute('aria-pressed')!=='true',v=on?o.getAttribute('data-kp-v'):'';
+    [].forEach.call(root.querySelectorAll('[data-kp-o]'),function(b){if(b.getAttribute('data-kp-o')===t)b.setAttribute('aria-pressed',b===o&&on?'true':'false')});
+    [].forEach.call(document.querySelectorAll('[data-kp-opt]'),function(i){if(i.getAttribute('data-kp-opt')===t)i.value=v});
+    [].forEach.call(document.querySelectorAll('[data-kp-opt-show]'),function(sp){if(sp.getAttribute('data-kp-opt-show')===t)sp.textContent=v?v+' '+(t.split(', ')[1]||''):'не выбрана'})});
+  // смена диаметра или прочности — цена варианта, когда выбраны все оси
+  root.addEventListener('click',function(e){if(!e.target.closest('[data-kp-d],[data-kp-o]'))return;setTimeout(function(){
+    var pr=f('price'),sel={},n=0,d=root.querySelector('[data-kp-d][aria-pressed="true"]');
+    if(d){sel[AXIS]=d.getAttribute('data-kp-d');n++}
+    [].forEach.call(root.querySelectorAll('[data-kp-o][aria-pressed="true"]'),function(b){sel[b.getAttribute('data-kp-o')]=b.getAttribute('data-kp-v');n++});
+    var hit=n===EXTRA.length+1&&EDS.filter(function(x){return Object.keys(sel).every(function(k){return x[k]===sel[k]})})[0];
+    var v=hit&&money(hit.price);pr.textContent=v||pr.getAttribute('data-kp-base')},0)});
   function get(path,params,cb,tries){
     var qs=Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k])}).join('&');
     fetch('https://'+host+'/api/'+path+'/?'+qs).then(function(r){return r.json()}).then(function(d){

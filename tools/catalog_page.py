@@ -516,7 +516,7 @@ ROPES_JS = r"""
     function card(p, i) {
       var by = {};
       arr(p.characteristics).forEach(function (c) { by[c.title] = c.value; });
-      var opts = arr(p.json_options), axis = opts[0] && opts[0].title;
+      var opts = arr(p.json_options), axis = (opts.filter(function (o) { return o.title === 'Диаметр, мм'; })[0] || opts[0] || {}).title;
       var ds = arr(p.editions).map(function (e) { return num(axis ? e[axis] : ''); })
         .filter(function (n) { return n > 0; }).sort(function (a, b) { return a - b; });
       var code = by['Марка'] || p.sku || '';
