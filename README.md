@@ -77,6 +77,7 @@
 ## Каталог
 
 `python tools/catalog_page.py` → `tilda/catalog.html` — код вайб-блока для страницы Тильды с адресом `catalog`
+(Тильда: страница 403919709 — копия главной с формой-приёмником T678, в `<head>` пока `noindex`)
 (превью — `tilda/catalog-preview.html`, локально: `http://127.0.0.1:4450/tilda/catalog-preview.html`).
 Прототип — `design/kordstar-prototypes.fig`, раздел «Каталог», фрейм «Каталог».
 
