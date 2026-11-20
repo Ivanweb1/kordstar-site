@@ -132,7 +132,10 @@ def groups():
                 '<section class="kc-group kc-group--off" data-kc-group="%s" data-kc-off>'
                 '<div class="kc-group__head"><h2 class="kc-group__title">%s</h2></div></section>' % (cid, E(cname)))
             continue
-        if items:
+        if cid == 'ropes':
+            # позиции раздела «Стальные канаты» грузятся из каталога Тильды (как на /steel-ropes), см. ROPES_JS
+            cards = '<p class="kc-load" data-kc-ropes>Загружаем канаты…</p>'
+        elif items:
             cards = ''.join(card(c, t, d, 'Предзаказ', 'order', i) for i, (t, d) in enumerate(items))
         else:
             cards = card(c, req[0], req[1], 'Оставить запрос', 'parts', 0)
@@ -303,6 +306,14 @@ display:block;background:linear-gradient(180deg,#f4f8f9 0%,#eaf3f3 55%,#f4f8f9 1
 .vb-krd .kc-card:hover{box-shadow:0 18px 40px rgba(32,64,67,.12);transform:translateY(-2px)}
 .vb-krd .kc-card__ph{display:flex;align-items:center;justify-content:center;aspect-ratio:4/3;margin:0 0 12px;border-radius:14px;background:radial-gradient(120% 100% at 50% 0%,#f3f9f9 0%,#e3eff0 100%)}
 .vb-krd .kc-card__ph img{width:60px;height:60px;border-radius:16px;background:#fff;box-shadow:0 10px 26px rgba(32,64,67,.12)}
+.vb-krd .kc-load{grid-column:1/-1;margin:16px 0;font-size:14px;color:var(--kc-muted)}
+.vb-krd .kc-load a{color:var(--kc-accent)}
+.vb-krd a.kc-card__ph{text-decoration:none}
+.vb-krd .kc-card__ph--photo{overflow:hidden;background:#eef3f4}
+.vb-krd .kc-card__ph--photo img{width:100%;height:100%;object-fit:cover;border-radius:0;background:none;box-shadow:none}
+.vb-krd .kc-card__title a{color:inherit;text-decoration:none}
+.vb-krd .kc-card__title a:hover{color:var(--kc-accent)}
+.vb-krd .kc-card__code{margin:2px 0 0;padding:0 8px;font-size:12px;line-height:1.4;color:var(--kc-muted);word-break:break-word}
 .vb-krd .kc-card--wide{grid-column:1/-1;display:grid;grid-template-columns:200px 1fr auto;grid-template-rows:auto auto 1fr;column-gap:28px;align-items:start;padding:12px 32px 12px 12px}
 .vb-krd .kc-card--wide .kc-card__ph{grid-row:1/4;aspect-ratio:auto;height:100%;min-height:130px;margin:0}
 .vb-krd .kc-card--wide .kc-card__title{grid-column:2;margin-top:20px;font-size:17px}
@@ -386,7 +397,6 @@ JS = r"""
   var root = document.getElementById('kd-catalog');
   if (!root) return;
   var groups = [].slice.call(root.querySelectorAll('[data-kc-group]'));
-  var cards = [].slice.call(root.querySelectorAll('.kc-card'));
   var search = root.querySelector('[data-kc-search]');
   var sort = root.querySelector('[data-kc-sort]');
   var empty = root.querySelector('.kc-empty');
@@ -407,7 +417,7 @@ JS = r"""
       var id = g.getAttribute('data-kc-group');
       var inCat = current === 'all' || current === id;
       if (g.hasAttribute('data-kc-off')) { g.hidden = current !== 'all' || !!q; return; }
-      var n = 0;
+      var n = g.querySelector('.kc-load') && !q ? 1 : 0;
       [].slice.call(g.querySelectorAll('.kc-card')).forEach(function (c) {
         var hit = !q || c.getAttribute('data-kc-name').indexOf(q) !== -1 ||
           c.querySelector('.kc-card__text').textContent.toLowerCase().indexOf(q) !== -1;
@@ -465,25 +475,108 @@ JS = r"""
   });
   // «Предзаказ» / «Оставить запрос»: подставляем товар в поп-ап (свой обработчик срабатывает раньше,
   // чем общий на document, который открывает поп-ап)
-  cards.forEach(function (c) {
-    var btn = c.querySelector('[data-kc-product]');
-    btn.addEventListener('click', function () {
-      var pop = document.getElementById('krd-pop-' + btn.getAttribute('data-krd-popup'));
-      if (!pop) return;
-      var v = btn.getAttribute('data-kc-product');
-      var field = pop.querySelector('[data-kc-target]');
-      var label = pop.querySelector('[data-kc-label]');
-      if (field) field.value = v;
-      if (label) label.textContent = v;
-    });
+  root.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-kc-product]');
+    if (!btn) return;
+    var pop = document.getElementById('krd-pop-' + btn.getAttribute('data-krd-popup'));
+    if (!pop) return;
+    var v = btn.getAttribute('data-kc-product');
+    var field = pop.querySelector('[data-kc-target]');
+    var label = pop.querySelector('[data-kc-label]');
+    if (field) field.value = v;
+    if (label) label.textContent = v;
   });
   search.addEventListener('input', apply);
   sort.addEventListener('change', function () { order(); apply(); });
 
+  /*ROPES*/
   var start = (location.hash || '').slice(1);
   show(start && root.querySelector('.kc-chip[data-kc-show="' + start + '"]') ? start : 'all', false);
 })();
 """
+
+# Канаты в общем каталоге — из каталога Тильды (Магазин → Товары → «Стальные канаты»), тот же API, что у /steel-ropes
+# (tools/ropes_dynamic.py). Номер раздела записан частями: tilda_block.py заменяет длинные числа короткими метками.
+ROPES_JS = r"""
+  (function () {
+    var box = root.querySelector('[data-kc-ropes]');
+    if (!box) return;
+    var grid = box.parentNode, group = grid.closest('[data-kc-group]');
+    var PART = ['434043', '879043'].join(''), PRODUCT = '/product', ICON = 'ICON_URL';
+    var host = 'store.tildaapi.com';
+    function mk(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+    function arr(v) {
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string' && v) { try { var r = JSON.parse(v); return Array.isArray(r) ? r : []; } catch (e) {} }
+      return [];
+    }
+    function num(s) { return parseFloat(String(s).replace(',', '.')) || 0; }
+    function lbl(n) { return String(n).replace('.', ','); }
+    function card(p, i) {
+      var by = {};
+      arr(p.characteristics).forEach(function (c) { by[c.title] = c.value; });
+      var opts = arr(p.json_options), axis = opts[0] && opts[0].title;
+      var ds = arr(p.editions).map(function (e) { return num(axis ? e[axis] : ''); })
+        .filter(function (n) { return n > 0; }).sort(function (a, b) { return a - b; });
+      var code = by['Марка'] || p.sku || '';
+      var title = p.title || ('Канат ' + (by['Конструкция'] || code));
+      var coat = /^Оцинков/i.test(by['Покрытие проволоки'] || '') ? 'Оцинкованный' : 'Без покрытия';
+      var bits = [coat];
+      if (by['Обозначение свивки']) bits.push('свивка ' + by['Обозначение свивки']);
+      var text = bits.join(', ') + '.';
+      if (ds.length) text += ' Диаметр ' + (ds[0] === ds[ds.length - 1] ? lbl(ds[0]) : lbl(ds[0]) + '–' + lbl(ds[ds.length - 1])) + ' мм.';
+      var url = PRODUCT + '?p=' + p.uid + '&s=' + PART;
+      var a = mk('article', 'kc-card');
+      a.setAttribute('data-kc-cat', 'ropes');
+      a.setAttribute('data-kc-name', (title + ' ' + code + ' ' + code.replace(/x/g, '×')).toLowerCase());
+      a.setAttribute('data-kc-rank', i);
+      var gal = arr(p.gallery).map(function (g) { return g.img; }).filter(Boolean);
+      var ph = mk('a', 'kc-card__ph' + (gal.length ? ' kc-card__ph--photo' : ''));
+      ph.href = url; ph.setAttribute('aria-label', 'Подробнее: ' + title + ' ' + code);
+      var img = mk('img'); img.src = gal[0] || ICON; img.alt = ''; img.loading = 'lazy';
+      if (!gal.length) { img.width = 72; img.height = 72; }
+      ph.appendChild(img); a.appendChild(ph);
+      var h = mk('h3', 'kc-card__title'), ha = mk('a', null, title);
+      ha.href = url; h.appendChild(ha); a.appendChild(h);
+      if (code) a.appendChild(mk('p', 'kc-card__code', code));
+      a.appendChild(mk('p', 'kc-card__text', text));
+      var prices = arr(p.editions).map(function (e) { return num(e.price); }).filter(function (n) { return n > 0; });
+      a.appendChild(mk('p', 'kc-card__price', prices.length ? 'от ' + Math.min.apply(null, prices).toLocaleString('ru-RU') + ' ₽' : 'Цена по запросу'));
+      var b = mk('button', 'kc-card__btn', 'Предзаказ');
+      b.type = 'button'; b.setAttribute('data-krd-popup', 'order'); b.setAttribute('data-kc-product', 'Канат ' + (code || title));
+      a.appendChild(b);
+      return a;
+    }
+    // числа у раздела, в чипсах и боковом меню; «Все» — на разницу
+    function counts(n) {
+      var c = group.querySelector('.kc-group__count'), old = c ? +c.textContent || 0 : 0;
+      if (c) c.textContent = n;
+      root.querySelectorAll('[data-kc-show="ropes"] span').forEach(function (e) { e.textContent = n; });
+      root.querySelectorAll('[data-kc-show="all"] span').forEach(function (e) { e.textContent = Math.max(0, +e.textContent - old + n); });
+    }
+    function fail() {
+      box.textContent = 'Не удалось загрузить канаты. ';
+      var l = mk('a', null, 'Открыть раздел «Стальные канаты»'); l.href = '/steel-ropes'; box.appendChild(l);
+    }
+    function recid() { var r = root.closest('.r'); return r ? String(r.id || '').replace('rec', '') : ''; }
+    function get(slice, acc, tries) {
+      var url = 'https://' + host + '/api/getproductslist/?storepartuid=' + PART + '&recid=' + encodeURIComponent(recid()) +
+        '&c=' + Date.now() + '&getparts=false&getoptions=false&slice=' + slice + '&size=100';
+      fetch(url).then(function (r) { return r.json(); }).then(function (d) {
+        if (d && d.redirectto && !tries) { host = host.split('.').slice(0, -1).join('.') + '.' + d.redirectto; get(slice, acc, 1); return; }
+        acc = acc.concat((d && d.products) || []);
+        if (d && d.nextslice) { get(+d.nextslice, acc, tries); return; }
+        if (!acc.length) { fail(); return; }
+        box.remove();
+        acc.forEach(function (p, i) { grid.appendChild(card(p, i)); });
+        counts(acc.length);
+        order(); apply();
+      }).catch(fail);
+    }
+    get(1, [], 0);
+  })();
+"""
+JS = JS.replace('/*ROPES*/', ROPES_JS.strip().replace('ICON_URL', CATS[0][2]))
 
 SEARCH_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="#69979c" stroke-width="2" stroke-linecap="round">'
                '<circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>')
