@@ -2425,3 +2425,24 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(function () { bar.classList.remove('is-open'); }, 300);
   });
 })();
+
+/* ---------- Награды: диплом открывается по клику на весь экран ---------- */
+(function () {
+  var box = document.querySelector('.krd-aw__box');
+  if (!box) return;
+  var img = box.querySelector('img');
+  var last = null;
+  function close() { box.hidden = true; img.removeAttribute('src'); if (last) last.focus(); }
+  document.querySelectorAll('.krd-aw__card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var src = card.querySelector('img');
+      last = card;
+      img.src = src.currentSrc || src.src;
+      img.alt = src.alt;
+      box.hidden = false;
+      box.querySelector('.krd-aw__close').focus();
+    });
+  });
+  box.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) close(); });
+})();

@@ -110,3 +110,77 @@
     padding-left: var(--krd-inset, 20px) !important; padding-right: var(--krd-inset, 20px) !important;
   }
 }
+
+/* ---- Награды: дипломы выставок и статья в журнале СТТ (блок перед «Как мы работаем?») ---- */
+.krd-aw { --aw-ink: #203133; --aw-dim: #798385; --aw-line: #DCE7E8; --aw-soft: #F1F2F3; --aw-accent: #457c82;
+  padding: 80px 0; background: #fff; font-family: var(--t-text-font); color: var(--aw-ink); }
+.krd-aw__inner { display: grid; grid-template-columns: clamp(260px, 26vw, 360px) 1fr; gap: 12px; max-width: 1440px;
+  margin: 0 auto; padding: 0 120px; box-sizing: border-box; align-items: stretch; }
+.krd-aw__side { display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: clamp(24px, 3vw, 40px);
+  background: #f4f8f9; }
+.krd-aw__title { margin: 0; font-family: var(--t-headline-font); font-size: 32px; line-height: 1.4; font-weight: 700;
+  text-transform: uppercase; color: rgb(32, 64, 67); }
+.krd-aw__lead { margin: 0; font-size: 16px; line-height: 1.4; color: var(--aw-dim); }
+.krd-aw__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.krd-aw__card, .krd-aw__press { display: flex; flex-direction: column; box-sizing: border-box; min-width: 0; margin: 0;
+  padding: 0; border: 1px solid var(--aw-soft); border-radius: 24px; background: #fff; overflow: hidden; text-align: left;
+  font: inherit; color: inherit; transition: border-color .35s, box-shadow .45s; }
+.krd-aw__card { cursor: zoom-in; }
+.krd-aw__card:hover, .krd-aw__card:focus-visible { border-color: #c4d6d8; box-shadow: 0 18px 40px rgba(32, 49, 51, .08); outline: none; }
+.krd-aw__media { display: flex; justify-content: center; padding: 16px 16px 0; background: #f4f8f9; }
+.krd-aw__media img { display: block; width: 100%; aspect-ratio: 910 / 1286; object-fit: cover; border-radius: 6px 6px 0 0;
+  box-shadow: 0 6px 18px rgba(32, 49, 51, .12); transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
+.krd-aw__card:hover .krd-aw__media img { transform: translateY(-4px); }
+.krd-aw__body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 20px; }
+.krd-aw__name { font-size: 18px; line-height: 1.3; font-weight: 600; color: var(--aw-ink); }
+.krd-aw__desc { font-size: 14px; line-height: 1.45; color: var(--aw-dim); }
+.krd-aw__meta { margin-top: auto; padding-top: 4px; font-size: 13px; line-height: 1.4; color: var(--aw-accent); }
+.krd-aw__press { gap: 10px; padding: 20px 18px; background: linear-gradient(160deg, #e7f1f2 0%, #f4f8f9 60%); }
+.krd-aw__tag { align-self: flex-start; padding: 6px 12px; border-radius: 999px; background: #fff; font-size: 12px; color: var(--aw-accent); }
+.krd-aw__issue { margin: 12px 0 8px; font-family: var(--t-headline-font); font-size: 48px; line-height: 1; font-weight: 800;
+  letter-spacing: -.02em; color: rgb(32, 64, 67); }
+.krd-aw__issue b { display: block; margin-top: 4px; font-size: 22px; font-weight: 600; color: var(--aw-accent); letter-spacing: 0; }
+.krd-aw__links { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 12px; }
+.krd-aw__btn { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; box-sizing: border-box;
+  border: 1px solid var(--aw-line); border-radius: 999px; background: #fff; color: var(--aw-accent); font-size: 14px;
+  font-weight: 500; text-decoration: none; transition: background-color .25s, border-color .25s, color .25s; }
+.krd-aw__btn:hover { border-color: #b8d1d3; }
+.krd-aw__btn--main { border-color: var(--aw-accent); background: var(--aw-accent); color: #fff; }
+.krd-aw__btn--main:hover { background: #3a6a6f; border-color: #3a6a6f; }
+/* просмотр диплома */
+.krd-aw__box { position: fixed; inset: 0; z-index: 99998; display: flex; align-items: center; justify-content: center;
+  padding: 24px; box-sizing: border-box; background: rgba(20, 32, 34, .82); cursor: zoom-out; }
+.krd-aw__box[hidden] { display: none; }
+.krd-aw__box img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, .35); }
+.krd-aw__close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  background: #fff; color: var(--aw-ink, #203133); font-size: 28px; line-height: 44px; cursor: pointer; }
+@media screen and (max-width: 1199px) {
+  .krd-aw__inner { padding: 0 40px; }
+  .krd-aw__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media screen and (max-width: 959px) {
+  .krd-aw__inner { grid-template-columns: 1fr; }
+}
+@media screen and (min-width: 640px) and (max-width: 959px) {
+  .krd-aw__inner { max-width: var(--krd-col, none); padding-left: var(--krd-inset, 20px); padding-right: var(--krd-inset, 20px); }
+}
+@media screen and (max-width: 639px) {
+  .krd-aw { padding: 40px 12px; }
+  .krd-aw__inner { padding: 0; }
+  .krd-aw__side { padding: 20px; border-radius: 32px; }
+  .krd-aw__title { font-size: 24px; }
+  .krd-aw__lead { font-size: 14px; line-height: 1.5; }
+  .krd-aw__grid { gap: 8px; }
+  .krd-aw__card, .krd-aw__press { border-radius: 20px; }
+  .krd-aw__media { padding: 10px 10px 0; }
+  .krd-aw__body { padding: 12px 12px 14px; gap: 6px; }
+  .krd-aw__name { font-size: 15px; }
+  .krd-aw__desc { font-size: 12px; }
+  .krd-aw__meta { font-size: 12px; }
+  .krd-aw__press { padding: 16px; }
+  .krd-aw__issue { font-size: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .krd-aw__media img { transition: none; }
+  .krd-aw__card:hover .krd-aw__media img { transform: none; }
+}

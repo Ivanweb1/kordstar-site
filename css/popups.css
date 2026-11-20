@@ -179,8 +179,8 @@
 }
 .krd-cookie__btn:hover { background: #3a6a6f; }
 @media (max-width: 640px) {
-  .krd-cookie { left: 12px; right: 12px; bottom: 12px; max-width: none; flex-direction: column; align-items: stretch; gap: 14px; padding: 18px; }
-  .krd-cookie__btn { width: 100%; }
+  .krd-cookie { left: 12px; right: 12px; bottom: 12px; width: auto; max-width: calc(100vw - 24px); flex-direction: column; align-items: stretch; gap: 14px; padding: 18px; }
+  .krd-cookie__btn { box-sizing: border-box; width: 100%; max-width: 100%; }
 }
 
 /* согласие на обработку данных */
