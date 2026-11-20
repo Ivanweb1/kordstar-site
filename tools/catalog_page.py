@@ -504,6 +504,7 @@ ROPES_JS = r"""
     var grid = box.parentNode, group = grid.closest('[data-kc-group]');
     var PART = ['434043', '879043'].join(''), PRODUCT = '/product', ICON = 'ICON_URL';
     var host = 'store.tildaapi.com';
+    var SNAP = SNAP_JSON;
     function mk(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
     function arr(v) {
       if (Array.isArray(v)) return v;
@@ -554,7 +555,15 @@ ROPES_JS = r"""
       root.querySelectorAll('[data-kc-show="ropes"] span').forEach(function (e) { e.textContent = n; });
       root.querySelectorAll('[data-kc-show="all"] span').forEach(function (e) { e.textContent = Math.max(0, +e.textContent - old + n); });
     }
+    function show(list) {
+      box.remove();
+      list.forEach(function (p, i) { grid.appendChild(card(p, i)); });
+      counts(list.length);
+      order(); apply();
+    }
+    // магазин Тильды отдаёт товары только своему домену — на GitHub Pages и локально показываем выгрузку
     function fail() {
+      if (box.parentNode && SNAP.length) { show(SNAP.map(function (p) { p.uid = p.uid.join(''); return p; })); return; }
       box.textContent = 'Не удалось загрузить канаты. ';
       var l = mk('a', null, 'Открыть раздел «Стальные канаты»'); l.href = '/steel-ropes'; box.appendChild(l);
     }
@@ -567,16 +576,34 @@ ROPES_JS = r"""
         acc = acc.concat((d && d.products) || []);
         if (d && d.nextslice) { get(+d.nextslice, acc, tries); return; }
         if (!acc.length) { fail(); return; }
-        box.remove();
-        acc.forEach(function (p, i) { grid.appendChild(card(p, i)); });
-        counts(acc.length);
-        order(); apply();
+        show(acc);
       }).catch(fail);
     }
     get(1, [], 0);
   })();
 """
-JS = JS.replace('/*ROPES*/', ROPES_JS.strip().replace('ICON_URL', CATS[0][2]))
+def snapshot():
+    # data/ropes-tilda.json → тот же вид, что отдаёт API магазина; uid частями (сборщик заменяет длинные числа метками)
+    import json
+    out = []
+    for r in json.load(open(os.path.join(ROOT, 'data', 'ropes-tilda.json'), encoding='utf-8')):
+        ch = r['characteristics']
+        ed = r['editions']
+        uid = str(r.get('productuid', ''))
+        out.append({
+            'uid': [uid[:6], uid[6:]], 'title': r['title'], 'sku': r['sku'],
+            'characteristics': [{'title': t, 'value': v} for t, v in zip(ch['title'], ch['value'])
+                                if t in ('Марка', 'Конструкция', 'Покрытие проволоки', 'Обозначение свивки')],
+            'json_options': [{'title': 'Диаметр, мм'}],
+            'editions': [{'Диаметр, мм': d, 'price': pr} for d, pr in zip(ed['Диаметр, мм'], ed['price'])],
+            'gallery': [],
+        })
+    js = json.dumps(out, ensure_ascii=False, separators=(',', ':'))
+    assert '<' not in js
+    return js
+
+
+JS = JS.replace('/*ROPES*/', ROPES_JS.strip().replace('ICON_URL', CATS[0][2]).replace('SNAP_JSON', snapshot()))
 
 SEARCH_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="#69979c" stroke-width="2" stroke-linecap="round">'
                '<circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>')
